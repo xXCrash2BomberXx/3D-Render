@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        class Obj {
+            static prism(edges, args = [], x = 0, y = 0, z = 0, width = 1, height = 1, depth = 1, strict = true) {
+                var newArr = [];
+                var arr = [];
+                for (var vertex = 0; vertex < edges; vertex++) {
+                    arr.push([x + (Math.sin(vertex / edges * 2 * Math.PI) + 1) / 2 * width,
+                    y + (Math.cos(vertex / edges * 2 * Math.PI) + 1) / 2 * height]);
+                }
+                newArr.push([]);
+                newArr.push([]);
+                for (var i = 0; i < arr.length; i++) {
+                    newArr[0].push(arr[i].concat([z]));
+                    newArr[1].push(arr[i].concat([z + depth]));
+                }
+                newArr[0].push('fill');
+                if (args.length > 0) {
+                    newArr[0].push(args[(0) % args.length]);
+                } else if (strict) {
+                    newArr[0].push("#000000");
+                }
+                newArr[1].push('fill');
+                if (args.length > 0) {
+                    newArr[1].push(args[(1) % args.length]);
+                } else if (strict) {
+                    newArr[1].push("#000000");
+                }
+                for (var i = 0; i < arr.length; i++) {
+                    newArr.push([]);
+                    newArr[i + 2].push(arr[i].concat([z]));
+                    newArr[i + 2].push(arr[i].concat([z + depth]));
+                    if (i + 1 < arr.length) {
+                        newArr[i + 2].push(arr[i + 1].concat([z + depth]));
+                        newArr[i + 2].push(arr[i + 1].concat([z]));
+                    } else {
+                        newArr[i + 2].push(arr[0].concat([z + depth]));
+                        newArr[i + 2].push(arr[0].concat([z]));
+                    }
+                    newArr[i + 2].push('fill');
+                    if (args.length > 0) {
+                        newArr[i + 2].push(args[(i + 2) % args.length]);
+                    } else if (strict) {
+                        newArr[i + 2].push("#000000");
+                    }
+                }
+                return newArr;
+            }
+            static pyramid(edges, args = [], x = 0, y = 0, z = 0, width = 1, height = 1, depth = 1, strict = true) {
+                var newArr = [];
+                var arr = [];
+                for (var vertex = 0; vertex < edges; vertex++) {
+                    arr.push([x + (Math.sin(vertex / edges * 2 * Math.PI) + 1) / 2 * width,
+                    y + (Math.cos(vertex / edges * 2 * Math.PI) + 1) / 2 * height]);
+                }
+                newArr.push([]);
+                newArr.push([]);
+                for (var i = 0; i < arr.length; i++) {
+                    newArr[0].push(arr[i].concat([z]));
+                    newArr[1].push([(2 * x + width) / 2, (2 * y + height) / 2, z + depth]);
+                }
+                newArr[0].push('fill');
+                if (args.length > 0) {
+                    newArr[0].push(args[(0) % args.length]);
+                } else if (strict) {
+                    newArr[0].push("#000000");
+                }
+                newArr[1].push('fill');
+                if (args.length > 0) {
+                    newArr[1].push(args[(1) % args.length]);
+                } else if (strict) {
+                    newArr[1].push("#000000");
+                }
+                for (var i = 0; i < arr.length; i++) {
+                    newArr.push([]);
+                    newArr[i + 2].push(arr[i].concat([z]));
+                    newArr[i + 2].push([(2 * x + width) / 2, (2 * y + height) / 2, z + depth]);
+                    if (i + 1 < arr.length) {
+                        newArr[i + 2].push([(2 * x + width) / 2, (2 * y + height) / 2, z + depth]);
+                        newArr[i + 2].push(arr[i + 1].concat([z]));
+                    } else {
+                        newArr[i + 2].push([(2 * x + width) / 2, (2 * y + height) / 2, z + depth]);
+                        newArr[i + 2].push(arr[0].concat([z]));
+                    }
+                    newArr[i + 2].push('fill');
+                    if (args.length > 0) {
+                        newArr[i + 2].push(args[(i + 2) % args.length]);
+                    } else if (strict) {
+                        newArr[i + 2].push("#000000");
+                    }
+                }
+                return newArr;
+            }
+            static rotatePoint(x, y, z, theta_x, theta_y, theta_z) {
+                return [x * Math.cos(theta_z * Math.PI / 180) * Math.cos(theta_y * Math.PI / 180) + y * Math.cos(theta_z * Math.PI / 180) * Math.sin(theta_y * Math.PI / 180) * Math.sin(theta_x * Math.PI / 180) - y * Math.sin(theta_z * Math.PI / 180) * Math.cos(
+                    theta_x * Math.PI / 180) + z * Math.cos(theta_z * Math.PI / 180) * Math.sin(theta_y * Math.PI / 180) * Math.cos(theta_x * Math.PI / 180) + z * Math.sin(theta_z * Math.PI / 180) * Math.sin(theta_x * Math.PI / 180),
+                x * Math.sin(theta_z * Math.PI / 180) * Math.cos(theta_y * Math.PI / 180) + y * Math.sin(theta_z * Math.PI / 180) * Math.sin(theta_y * Math.PI / 180) * Math.sin(theta_x * Math.PI / 180) + y * Math.cos(theta_z * Math.PI / 180) * Math.cos(
+                    theta_x * Math.PI / 180) + z * Math.sin(theta_z * Math.PI / 180) * Math.sin(theta_y * Math.PI / 180) * Math.cos(theta_x * Math.PI / 180) - z * Math.cos(theta_z * Math.PI / 180) * Math.sin(theta_x * Math.PI / 180),
+                -x * Math.sin(theta_y * Math.PI / 180) + y * Math.cos(theta_y * Math.PI / 180) * Math.sin(
+                    theta_x * Math.PI / 180) + z * Math.cos(theta_y * Math.PI / 180) * Math.cos(theta_x * Math.PI / 180)];
+            }
+            constructor(canvas, coords, wireframe = false, x_axis = null, y_axis = null, z_axis = null, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = false, strict = true) {
+                this.isPyramid = pyramid;
+                this.canvas = canvas;
+                this.ctx = canvas.getContext("2d");
+                this.strict = strict;
+                if (typeof (coords[0]) === "string") {
+                    if (coords.length === 7) {
+                        var x = coords[1];
+                        var y = coords[2];
+                        var z = coords[3];
+                        var width = coords[4];
+                        var height = coords[5];
+                        var depth = coords[6];
+                    } else {
+                        throw new Error("Use the format of [\"prebuilt_shape_name\", x, y, z, width, height, depth]");
+                    }
+                    if (coords[0] === "cube" || coords[0] === "cuboid") {
+                        this.coords = [
+                            [ // Front
+                                [x, y, z],
+                                [x + width, y, z],
+                                [x + width, y + height, z],
+                                [x, y + height, z],
+                                "fill", "#FF0000"
+                            ],
+                            [ // Left
+                                [x, y, z],
+                                [x, y, z + depth],
+                                [x, y + height, z + depth],
+                                [x, y + height, z],
+                                "fill", "#00FF00"
+                            ],
+                            [ // Bottom
+                                [x, y + height, z],
+                                [x, y + height, z + depth],
+                                [x + width, y + height, z + depth],
+                                [x + width, y + height, z],
+                                "fill", "#0000FF"
+                            ],
+                            [ // Right
+                                [x + width, y, z],
+                                [x + width, y, z + depth],
+                                [x + width, y + height, z + depth],
+                                [x + width, y + height, z],
+                                "fill", "#FFFF00"
+                            ],
+                            [ // Top
+                                [x, y, z],
+                                [x, y, z + depth],
+                                [x + width, y, z + depth],
+                                [x + width, y, z],
+                                "fill", "#00FFFF"
+                            ],
+                            [ // Back
+                                [x, y, z + depth],
+                                [x + width, y, z + depth],
+                                [x + width, y + height, z + depth],
+                                [x, y + height, z + depth],
+                                "fill", "#FF00FF"
+                            ]
+                        ];
+                    }
+                    else if (coords[0] === "tetrahedron") {
+                        this.coords = [
+                            [
+                                [x + width, y + height, z + depth],
+                                [x + width, y, z],
+                                [x, y + height, z],
+                                'fill', "#FF0000"
+                            ],
+                            [
+                                [x + width, y + height, z + depth],
+                                [x + width, y, z],
+                                [x, y, z + depth],
+                                'fill', "#00FF00"
+                            ],
+                            [
+                                [x + width, y + height, z + depth],
+                                [x, y + height, z],
+                                [x, y, z + depth],
+                                'fill', "#0000FF"
+                            ],
+                            [
+                                [x + width, y, z],
+                                [x, y + height, z],
+                                [x, y, z + depth],
+                                'fill', "#FFFF00"
+                            ]
+                        ];
+                    }
+                    else if (coords[0] === "octahedron") {
+                        this.coords = [
+                            [
+                                [x, y + height / 2, z + depth / 2],
+                                [x + width / 2, y, z + depth / 2],
+                                [x + width / 2, y + height / 2, z],
+                                "fill", "#FF0000"
+                            ],
+                            [
+                                [x, y + height / 2, z + depth / 2],
+                                [x + width / 2, y, z + depth / 2],
+                                [x + width / 2, y + height / 2, z + depth],
+                                "fill", "#00FF00"
+                            ],
+                            [
+                                [x + width, y + height / 2, z + depth / 2],
+                                [x + width / 2, y, z + depth / 2],
+                                [x + width / 2, y + height / 2, z],
+                                "fill", "#0000FF"
+                            ],
+                            [
+                                [x + width, y + height / 2, z + depth / 2],
+                                [x + width / 2, y, z + depth / 2],
+                                [x + width / 2, y + height / 2, z + depth],
+                                "fill", "#FFFF00"
+                            ],
+                            [
+                                [x, y + height / 2, z + depth / 2],
+                                [x + width / 2, y + height, z + depth / 2],
+                                [x + width / 2, y + height / 2, z],
+                                "fill", "#00FFFF"
+                            ],
+                            [
+                                [x, y + height / 2, z + depth / 2],
+                                [x + width / 2, y + height, z + depth / 2],
+                                [x + width / 2, y + height / 2, z + depth],
+                                "fill", "#FF00FF"
+                            ],
+                            [
+                                [x + width, y + height / 2, z + depth / 2],
+                                [x + width / 2, y + height, z + depth / 2],
+                                [x + width / 2, y + height / 2, z],
+                                "fill", "#000000"
+                            ],
+                            [
+                                [x + width, y + height / 2, z + depth / 2],
+                                [x + width / 2, y + height, z + depth / 2],
+                                [x + width / 2, y + height / 2, z + depth],
+                                "fill", "#7F7F7F"
+                            ]
+                        ];
+                    }
+                    else if (coords[0] === "dodecahedron") {
+                        this.coords = [
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width / 2, y, z + depth * (5 ** 0.5 - 1) / 4],
+                                [x + width / 2, y, z + depth * (5 - 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x, y + height * (5 ** 0.5 - 1) / 4, z + depth / 2],
+                                "fill", "#FF0000"
+                            ],
+                            [
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width / 2, y, z + depth * (5 ** 0.5 - 1) / 4],
+                                [x + width / 2, y, z + depth * (5 - 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width, y + height * (5 ** 0.5 - 1) / 4, z + depth / 2],
+                                "fill", "#00FF00"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width / 2, y, z + depth * (5 - 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (5 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x + width * (5 ** 0.5 - 1) / 4, y + height / 2, z + depth],
+                                "fill", "#0000FF"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width / 2, y, z + depth * (5 ** 0.5 - 1) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (5 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width * (5 ** 0.5 - 1) / 4, y + height / 2, z],
+                                "fill", "#FFFF00"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width / 2, y + height, z + depth * (5 ** 0.5 - 1) / 4],
+                                [x + width / 2, y + height, z + depth * (5 - 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x, y + height * (5 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#00FFFF"
+                            ],
+                            [
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width / 2, y + height, z + depth * (5 ** 0.5 - 1) / 4],
+                                [x + width / 2, y + height, z + depth * (5 - 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width, y + height * (5 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#FF00FF"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width / 2, y + height, z + depth * (5 - 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (5 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x + width * (5 ** 0.5 - 1) / 4, y + height / 2, z + depth],
+                                "fill", "#000000"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width / 2, y + height, z + depth * (5 ** 0.5 - 1) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (5 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width * (5 ** 0.5 - 1) / 4, y + height / 2, z],
+                                "fill", "#7F7F7F"
+                            ],
+                            [
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (5 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width, y + height * (5 - 5 ** 0.5) / 4, z + depth / 2],
+                                [x + width, y + height * (5 ** 0.5 - 1) / 4, z + depth / 2],
+                                "fill", "#7F0000"
+                            ],
+                            [
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (5 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width, y + height * (5 - 5 ** 0.5) / 4, z + depth / 2],
+                                [x + width, y + height * (5 ** 0.5 - 1) / 4, z + depth / 2],
+                                "fill", "#007F00"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (5 ** 0.5 - 1) / 4, y + height / 2, z],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x, y + height * (5 - 5 ** 0.5) / 4, z + depth / 2],
+                                [x, y + height * (5 ** 0.5 - 1) / 4, z + depth / 2],
+                                "fill", "#00007F"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (3 - 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (5 ** 0.5 - 1) / 4, y + height / 2, z + depth],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height * (1 + 5 ** 0.5) / 4, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x, y + height * (5 - 5 ** 0.5) / 4, z + depth / 2],
+                                [x, y + height * (5 ** 0.5 - 1) / 4, z + depth / 2],
+                                "fill", "#7F7F00"
+                            ]
+                        ];
+                    }
+                    else if (coords[0] === "icosahedron") {
+                        this.coords = [
+                            [
+                                [x + width / 2, y, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z],
+                                "fill", "#FF0000"
+                            ],
+                            [
+                                [x + width / 2, y + height, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z],
+                                "fill", "#00FF00"
+                            ],
+                            [
+                                [x + width / 2, y + height, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#0000FF"
+                            ],
+                            [
+                                [x + width / 2, y, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#FFFF00"
+                            ],
+                            [
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z],
+                                [x + width, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                [x + width, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#00FFFF"
+                            ],
+                            [
+                                [x + width / 2, y + height, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width / 2, y + height, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#FF00FF"
+                            ],
+                            [
+                                [x + width / 2, y + height, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width / 2, y + height, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#000000"
+                            ],
+                            [
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x + width, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                [x + width, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#7F7F7F"
+                            ],
+                            [
+                                [x + width / 2, y, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                "fill", "#7F0000"
+                            ],
+                            [
+                                [x + width / 2, y + height, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                "fill", "#007F00"
+                            ],
+                            [
+                                [x + width, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                [x + width / 2, y + height, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                "fill", "#00007F"
+                            ],
+                            [
+                                [x + width / 2, y, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (1 + 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x + width, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#7F7F00"
+                            ],
+                            [
+                                [x + width / 2, y, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width / 2, y, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#007F7F"
+                            ],
+                            [
+                                [x + width / 2, y, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width / 2, y, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#7F007F"
+                            ],
+                            [
+                                [x + width / 2, y + height, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#FF7F7F"
+                            ],
+                            [
+                                [x + width / 2, y, z + depth * (3 - 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#7FFF7F"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z],
+                                [x, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                [x, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#7F7FFF"
+                            ],
+                            [
+                                [x, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                [x + width / 2, y + height, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                "fill", "#FFFF7F"
+                            ],
+                            [
+                                [x + width / 2, y, z + depth * (1 + 5 ** 0.5) / 4],
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#7FFFFF"
+                            ],
+                            [
+                                [x + width * (3 - 5 ** 0.5) / 4, y + height / 2, z + depth],
+                                [x, y + height * (1 + 5 ** 0.5) / 4, z + depth / 2],
+                                [x, y + height * (3 - 5 ** 0.5) / 4, z + depth / 2],
+                                "fill", "#FF7FFF"
+                            ]
+                        ];
+                    }
+                } else if (typeof (coords[0]) === "number") {
+                    if (pyramid) {
+                        if (coords.length >= 7) {
+                            this.coords = Obj.pyramid(coords[0], coords.slice(7), coords[1], coords[2], coords[3], coords[4], coords[5], coords[6], this.strict);
+                        } else {
+                            throw new Error("Use the format of [sides, x, y, z, width, height, depth, ...colors]");
+                        }
+                    } else {
+                        if (coords.length >= 7) {
+                            this.coords = Obj.prism(coords[0], coords.slice(7), coords[1], coords[2], coords[3], coords[4], coords[5], coords[6], this.strict);
+                        } else {
+                            throw new Error("Use the format of [sides, x, y, z, width, height, depth, ...colors]");
+                        }
+                    }
+                } else {
+                    this.coords = coords;
+                }
+                this.wireframe = wireframe;
+                this.x_axis = x_axis;
+                this.y_axis = y_axis;
+                this.z_axis = z_axis;
+                this.x_avg;
+                this.y_avg;
+                this.z_avg;
+                this.rotate(theta_x, theta_y, theta_z);
+            }
+            draw() {
+                this.coords.sort(
+                    function (a, b) {
+                        a = a.filter(e => typeof (e) !== "string");
+                        b = b.filter(e => typeof (e) !== "string");
+                        return Math.max(...b.map(
+                            function (e) {
+                                try {
+                                    return e[2];
+                                } catch {
+                                    return -Infinity;
+                                }
+                            })
+                        ) - Math.max(...a.map(
+                            function (e) {
+                                try {
+                                    return e[2];
+                                } catch {
+                                    return -Infinity;
+                                }
+                            }));
+                    });
+                for (var face = (this.wireframe?0:(!this.isPyrmaid?1:Math.round(this.coords.length/2.0))); face < this.coords.length; face++) {
+                    var region = new Path2D();
+                    region.moveTo(this.coords[face][0][0], this.coords[face][0][1]);
+                    for (var point = 1; point < this.coords[face].length; point++) {
+                        region.lineTo(this.coords[face][point][0], this.coords[face][point][1]);
+                    }
+                    region.closePath();
+                    if (this.strict && this.wireframe) {
+                        this.ctx.strokeStyle = "#000000";
+                        this.ctx.fillStyle = "#000000";
+                    } else if (this.coords[face].indexOf("fill") + 1) {
+                        this.ctx.strokeStyle = this.coords[face][this.coords[face].indexOf("fill") + 1];
+                        this.ctx.fillStyle = this.coords[face][this.coords[face].indexOf("fill") + 1];
+                    }
+                    if (!this.wireframe) {
+                        this.ctx.fill(region);
+                    }
+                    this.ctx.stroke(region);
+                }
+            }
+            rotate(theta_x = 0, theta_y = 0, theta_z = 0) {
+                var x_avg = 0;
+                var y_avg = 0;
+                var z_avg = 0;
+                var vertices = 0;
+                for (var face = 0; face < this.coords.length; face++) {
+                    for (var point = 0; point < this.coords[face].length; point++) {
+                        if (Array.isArray(this.coords[face][point])) {
+                            x_avg += this.coords[face][point][0];
+                            y_avg += this.coords[face][point][1];
+                            z_avg += this.coords[face][point][2];
+                            vertices += 1;
+                        }
+                    }
+                }
+                x_avg /= vertices;
+                y_avg /= vertices;
+                z_avg /= vertices;
+                this.x_avg = x_avg;
+                this.y_avg = y_avg;
+                this.z_avg = z_avg;
+                if (this.x_axis !== null) {
+                    x_avg = this.x_axis;
+                }
+                if (this.y_axis !== null) {
+                    y_avg = this.y_axis;
+                }
+                if (this.z_axis !== null) {
+                    z_avg = this.z_axis;
+                }
+                for (var face = 0; face < this.coords.length; face++) {
+                    for (var point = 0; point < this.coords[face].length; point++) {
+                        if (Array.isArray(this.coords[face][point])) {
+                            var x = this.coords[face][point][0] - x_avg;
+                            var y = this.coords[face][point][1] - y_avg;
+                            var z = this.coords[face][point][2] - z_avg;
+                            var xyz = Obj.rotatePoint(x, y, z, theta_x, theta_y, theta_z);
+                            this.coords[face][point] = [xyz[0] + x_avg,
+                            xyz[1] + y_avg,
+                            xyz[2] + z_avg];
+                        }
+                    }
+                }
+                this.draw();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <canvas id="canvas"></canvas>
+        <script type="text/javascript">
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            var objs = [];
+            objs.push(new Obj(canvas, ["cube", 200, 200, 0, 50, 50, 50], wireframe = false, x_axis = null, y_axis = null, z_axis = null, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = false, strict = true));
+            objs.push(new Obj(canvas, ["cube", 200, 200, 50, 50, 50, 50], wireframe = false, x_axis = objs[0].x_avg, y_axis = objs[0].y_avg, z_axis = objs[0].z_avg, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = false, strict = true));
+            objs.push(new Obj(canvas, ["cube", 150, 200, 0, 50, 50, 50], wireframe = false, x_axis = objs[0].x_avg, y_axis = objs[0].y_avg, z_axis = objs[0].z_avg, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = false, strict = true));
+            objs.push(new Obj(canvas, [6, 50, 50, 0, 50, 50, 50], wireframe = true, x_axis = null, y_axis = null, z_axis = null, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = true, strict = true));
+            objs.push(new Obj(canvas, [5, 400, 50, 0, 50, 50, 50], wireframe = false, x_axis = null, y_axis = null, z_axis = null, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = false, strict = true));
+            objs.push(new Obj(canvas, [6, 400, 400, 0, 50, 50, 50, "#FF0000", "#0000FF"], wireframe = false, x_axis = null, y_axis = null, z_axis = null, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = true, strict = true));
+            objs.push(new Obj(canvas, ["icosahedron", 50, 400, 0, 50, 50, 50], wireframe = true, x_axis = null, y_axis = null, z_axis = null, theta_x = 0, theta_y = 0, theta_z = 0, pyramid = false, strict = false));
+
+            var pressed = [];
+            function keyDown(event) {
+                event.preventDefault();
+                if (!pressed.includes(event.code)) {
+                    pressed.push(event.code);
+                }
+            }
+            function keyUp(event) {
+                event.preventDefault();
+                for (var i = 0; i < pressed.length; i++) {
+                    if (pressed[i] === event.code) {
+                        pressed.splice(i, 1);
+                    }
+                }
+            }
+            var lastCoords = [null, null];
+            function mouseMove(event) {
+                objs.sort((a, b) => (a.z_avg < b.z_avg) ? 1 : -1);
+                clear();
+                var mouseMult = 0.5
+                for (var i = 0; i < objs.length; i++) {
+                    objs[i].rotate((event.offsetY - lastCoords[1]) * mouseMult, (lastCoords[0] - event.offsetX) * mouseMult);
+                }
+                lastCoords = [event.offsetX, event.offsetY];
+            }
+            function touchMove(event) {
+                objs.sort((a, b) => (a.z_avg < b.z_avg) ? 1 : -1);
+                clear();
+                var touchMult = 0.5
+                for (var i = 0; i < objs.length; i++) {
+                    objs[i].rotate((event.touches[0].clientY - lastCoords[1]) * touchMult, (lastCoords[0] - event.touches[0].clientX) * touchMult);
+                }
+                lastCoords = [event.touches[0].clientX, event.touches[0].clientY];
+            }
+            function clear() {
+                objs[0].ctx.clearRect(0, 0, objs[0].canvas.width, objs[0].canvas.height);
+            }
+            var moveInc = 1;
+            var loop = setInterval(function () {
+                objs.sort((a, b) => (a.z_avg < b.z_avg) ? 1 : -1);
+                if (pressed.includes("ArrowUp")) {
+                    clear();
+                    for (var i = 0; i < objs.length; i++) {
+                        objs[i].rotate(-moveInc, 0, 0);
+                    }
+                } if (pressed.includes("ArrowRight")) {
+                    clear();
+                    for (var i = 0; i < objs.length; i++) {
+                        objs[i].rotate(0, -moveInc, 0);
+                    }
+                } if (pressed.includes("ArrowDown")) {
+                    clear();
+                    for (var i = 0; i < objs.length; i++) {
+                        objs[i].rotate(moveInc, 0, 0);
+                    }
+                } if (pressed.includes("ArrowLeft")) {
+                    clear();
+                    for (var i = 0; i < objs.length; i++) {
+                        objs[i].rotate(0, moveInc, 0);
+                    }
+                } if (pressed.includes("Space")) {
+                    clear();
+                    for (var i = 0; i < objs.length; i++) {
+                        objs[i].rotate(0, 0, moveInc);
+                    }
+                } if (pressed.includes("ShiftLeft") || pressed.includes("ShiftRight")) {
+                    clear();
+                    for (var i = 0; i < objs.length; i++) {
+                        objs[i].rotate(0, 0, -moveInc);
+                    }
+                }
+            }, 5);
+            document.addEventListener("keydown", keyDown);
+            document.addEventListener("keyup", keyUp);
+            document.addEventListener("mousemove", mouseMove);
+            document.addEventListener("touchmove", touchMove);
+        </script>
+    </div>
+</body>
+</html>
