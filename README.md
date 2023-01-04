@@ -1,2 +1,2 @@
 # 3D-Render
-3D Modeling Program written in different languages
+3D Rendering Program written in different languages
