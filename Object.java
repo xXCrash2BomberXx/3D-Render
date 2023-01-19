@@ -18,8 +18,41 @@ class Object extends JPanel {
     private double center_x = 0;
     private double center_y = 0;
     private double center_z = 0;
+    private Boolean auto = true;
+    public Boolean wireframe = false;
     public Object (String obj, double x, double y, double z, double width, double height, double depth) {
         super();
+        generate(obj, x, y, z, width, height, depth);
+    }
+    public Object (String obj, double x, double y, double z, double width, double height, double depth, Boolean wire) {
+        super();
+        generate(obj, x, y, z, width, height, depth);
+        wireframe = wire;
+    }
+    public Object (String obj, double x, double y, double z, double width, double height, double depth, double x_axis, double y_axis, double z_axis) {
+        super();
+        generate(obj, x, y, z, width, height, depth);
+        auto = false;
+        center_x = x_axis;
+        center_y = y_axis;
+        center_z = z_axis;
+    }
+    public Object (String obj, double x, double y, double z, double width, double height, double depth, double x_axis, double y_axis, double z_axis, Boolean wire) {
+        super();
+        generate(obj, x, y, z, width, height, depth);
+        auto = false;
+        center_x = x_axis;
+        center_y = y_axis;
+        center_z = z_axis;
+        wireframe = wire;
+    }
+    public Object (Double[][][] obj) {
+        super();
+        coords = obj;
+        for (int i = 0; i < coords.length; i++)
+            regenPolygon(i);
+    }
+    private void generate (String obj, double x, double y, double z, double width, double height, double depth) {
         switch (obj) {
             case "cube":
                 addPoint(0, x, y, z);
@@ -310,12 +343,6 @@ class Object extends JPanel {
                 System.out.println("Incorrect String Argument");
         }
     }
-    public Object (Double[][][] obj) {
-        super();
-        coords = obj;
-        for (int i = 0; i < coords.length; i++)
-            regenPolygon(i);
-    }
     public static double getDepth (Double[][] face) {
         double avg = 0;
         for (Double[] i : face) {
@@ -378,7 +405,8 @@ class Object extends JPanel {
         coords[face][index][1] = y;
         coords[face][index][2] = z;
         regenPolygon(face);
-        autoCenter();
+        if (auto)
+            autoCenter();
     }
     public void addPoint (int face, double x, double y, double z) {
         setPoint(face, (coords.length == 0 || coords.length <= face ? 0 : coords[face].length), x, y, z);
@@ -466,7 +494,10 @@ class Object extends JPanel {
                         current = index;
                 }
                 g2D.setColor(colors[current]);
-                g2D.fill(polygon[current]);
+                if (wireframe)
+                    g2D.draw(polygon[current]);
+                else
+                    g2D.fill(polygon[current]);
                 indeces[current] = true;
             }
         }
@@ -475,8 +506,7 @@ class Object extends JPanel {
     }
     public static void main (String[] args) {
         JFrame frame = new JFrame("Movement");
-        Object obj = new Object("icosahedron", 200, 200, 0, 50, 50, 50);
-        frame.add(obj);
+        frame.add(new Object("icosahedron", 200, 200, 50, 50, 50, 50));
         frame.setSize(500, 500);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
