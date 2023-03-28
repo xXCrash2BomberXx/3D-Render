@@ -1,5 +1,6 @@
 package App;
 
+import java.awt.Color;
 import App.Control.Control;
 import App.View.J3D;
 import App.View.JObject;
@@ -7,15 +8,26 @@ import App.View.Sprite;
 
 public class App {
     public static void main(String args[]) throws IllegalArgumentException {
+        JObject object1_1 = new JObject("cube", 200, 200, 0, 50, 50, 50, false, true);  // No Fill, Auto Outline
+        JObject object1_2 = new JObject("cube", 200, 200, 50, 50, 50, 50, 225, 225, 25, 
+                                        new Color[] { Color.BLUE }, new Color[] { Color.RED });  // Blue Fill, Red Outline
+        JObject object1_4 = new JObject("icosahedron", 200, 200, 0, 50, 50, 50, false, 
+                                        new Color[]{});  // No Fill, Black Outline
+        JObject object1_3 = new JObject("cube", 150, 200, 0, 50, 50, 50, 225, 225, 25, 
+                                        true, false);  // Auto Fill, No Outline
+        JObject object2 = new JObject("icosahedron", 25, 25, 0, 50, 50, 50, 
+                                        new Color[]{}, false);  // Black Fill, No Outline
+        JObject object3 = new JObject("dodecahedron", 400, 400, 0, 50, 50, 50, 
+                                        true);  // Auto Fill, No Outline
+        JObject object4 = new JObject("octahedron", 25, 400, 0, 50, 50, 50, 
+                                        new Color[] { Color.BLUE, Color.RED });  // Alternating Blue and Red Fill, No Outline
+        JObject object5 = new JObject("tetrahedron", 225, 400, 0, 50, 50, 50);  // Atuo Fill, No Outline
+
         // NOTE: Sprites render on one Container, ignore depth, cannot be colored by face, and always appear on top but are faster to render
-        JObject sprite1_1 = new JObject("cube", 200, 200, 0, 50, 50, 50);
-        JObject sprite1_2 = new JObject("cube", 200, 200, 50, 50, 50, 50, 225, 225, 25);
-        JObject sprite1_3 = new JObject("cube", 150, 200, 0, 50, 50, 50, 225, 225, 25);
-        JObject sprite2 = new JObject("icosahedron", 25, 25, 0, 50, 50, 50);
-        JObject sprite3 = new JObject("dodecahedron", 425, 400, 0, 50, 50, 50);
-        JObject sprite4 = new JObject("octahedron", 25, 400, 0, 50, 50, 50, true);
-        Sprite sprite5 = new Sprite("tetrahedron", 425, 25, 0, 50, 50, 50);
-        Sprite sprite6 = new Sprite("icosahedron", 200, 200, 0, 50, 50, 50);
+            // All the mentioned limitations except the coloring by face can be overcome through usage of seperate Containers
+            // This is due to the Sprite being rendered as a single path instead of individual fillable paths
+        Sprite sprite1 = new Sprite("tetrahedron", 400, 25, 0, 50, 50, 50);
+        Sprite sprite2 = new Sprite("icosahedron", 225, 25, 0, 50, 50, 50);
         if (args.length > 0) {
             int width;
             try {
@@ -31,10 +43,14 @@ public class App {
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Exected a numeric height parameter");
             }
-            new Control(new J3D[] { sprite1_1, sprite1_2, sprite1_3, sprite2, sprite3, sprite4, sprite5, sprite6 },
-                    width, height);
+            new Control(new J3D[] { object1_1, object1_2, object1_3, object1_4,
+                                object2, object3, object4, object5,
+                                sprite1, sprite2 },
+                                width, height);
         } else {
-            new Control(new J3D[] { sprite1_1, sprite1_2, sprite1_3, sprite2, sprite3, sprite4, sprite5, sprite6 });
+            new Control(new J3D[] { object1_1, object1_2, object1_3, object1_4,
+                                object2, object3, object4, object5,
+                                sprite1, sprite2 });
         }
     }
 }
