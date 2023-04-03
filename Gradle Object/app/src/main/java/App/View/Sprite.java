@@ -1,14 +1,14 @@
 package App.View;
 
 // import javax.swing.JFrame;
-import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+// import java.awt.Container;
+// import java.awt.Graphics;
+// import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 import java.lang.Math;
-import javax.swing.SwingUtilities;
-import java.awt.MouseInfo;
-import java.awt.Point;
+// import javax.swing.SwingUtilities;
+// import java.awt.MouseInfo;
+// import java.awt.Point;
 
 public class Sprite extends Path2D.Double implements J3D {
         protected double[][][] coords = new double[1][1][3]; // [faces][lines][coordinates]
@@ -16,6 +16,460 @@ public class Sprite extends Path2D.Double implements J3D {
         protected double center_y = 0;
         protected double center_z = 0;
         protected Boolean auto = true;
+
+        public static double[][][] cube(double x, double y, double z,
+                        double width, double height, double depth) {
+                return new double[][][] {
+                                {
+                                                { x, y, z },
+                                                { x + width, y, z },
+                                                { x + width, y + height, z },
+                                                { x, y + height, z }
+                                },
+                                {
+                                                { x, y, z },
+                                                { x, y, z + depth },
+                                                { x, y + height, z + depth },
+                                                { x, y + height, z }
+                                },
+                                {
+                                                { x, y + height, z },
+                                                { x, y + height, z + depth },
+                                                { x + width, y + height, z + depth },
+                                                { x + width, y + height, z }
+                                },
+                                {
+                                                { x + width, y + height, z },
+                                                { x + width, y + height, z + depth },
+                                                { x + width, y, z + depth },
+                                                { x + width, y, z }
+                                },
+                                {
+                                                { x + width, y, z },
+                                                { x, y, z },
+                                                { x, y, z + depth },
+                                                { x + width, y, z + depth }
+                                },
+                                {
+                                                { x + width, y, z + depth },
+                                                { x + width, y + height, z + depth },
+                                                { x, y + height, z + depth },
+                                                { x, y, z + depth }
+                                }
+                };
+        }
+
+        public static double[][][] tetrahedron(double x, double y, double z,
+                        double width, double height, double depth) {
+                return new double[][][] {
+                                {
+                                                { x + width, y + height, z + depth },
+                                                { x + width, y, z },
+                                                { x, y + height, z }
+                                },
+                                {
+                                                { x + width, y + height, z + depth },
+                                                { x + width, y, z },
+                                                { x, y, z + depth }
+                                },
+                                {
+                                                { x + width, y + height, z + depth },
+                                                { x, y + height, z },
+                                                { x, y, z + depth }
+                                },
+                                {
+                                                { x + width, y, z },
+                                                { x, y + height, z },
+                                                { x, y, z + depth }
+                                }
+                };
+        }
+
+        public static double[][][] octahedron(double x, double y, double z,
+                        double width, double height, double depth) {
+                return new double[][][] {
+                                {
+                                                { x, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z }
+                                },
+                                {
+                                                { x, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z + depth }
+                                },
+                                {
+                                                { x + width, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z }
+                                },
+                                {
+                                                { x + width, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z + depth }
+                                },
+                                {
+                                                { x, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y + height, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z }
+                                },
+                                {
+                                                { x, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y + height, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z + depth }
+                                },
+                                {
+                                                { x + width, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y + height, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z }
+                                },
+                                {
+                                                { x + width, y + height / 2, z + depth / 2 },
+                                                { x + width / 2, y + height, z + depth / 2 },
+                                                { x + width / 2, y + height / 2, z + depth }
+                                }
+                };
+        }
+
+        public static double[][][] dodecahedron(double x, double y, double z,
+                        double width, double height, double depth) {
+                return new double[][][] {
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x, y + height * (Math.sqrt(5) - 1) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width, y + height * (Math.sqrt(5) - 1) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
+                                                                z + depth }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
+                                                                z }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x, y + height * (5 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width, y + height * (5 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
+                                                                z + depth }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
+                                                                z }
+                                },
+                                {
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width, y + height * (5 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x + width, y + height * (Math.sqrt(5) - 1) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width * (1 + Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width, y + height * (5 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x + width, y + height * (Math.sqrt(5) - 1) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
+                                                                z },
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x, y + height * (5 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x, y + height * (Math.sqrt(5) - 1) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width * (3 - Math.sqrt(5)) / 4,
+                                                                y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x, y + height * (5 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x, y + height * (Math.sqrt(5) - 1) / 4,
+                                                                z + depth / 2 }
+                                }
+                };
+        }
+
+        public static double[][][] icosahedron(double x, double y, double z,
+                        double width, double height, double depth) {
+                return new double[][][] {
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z }
+                                },
+                                {
+                                                { x + width / 2, y + height,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z }
+                                },
+                                {
+                                                { x + width / 2, y + height,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y + height,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y + height,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth }
+                                },
+                                {
+                                                { x + width / 2, y + height,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth }
+                                },
+                                {
+                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth }
+                                },
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width / 2, y,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y + height,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z },
+                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x + width / 2, y + height,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth }
+                                },
+                                {
+                                                { x + width / 2, y,
+                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                },
+                                {
+                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
+                                                                z + depth },
+                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
+                                                                z + depth / 2 },
+                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
+                                                                z + depth / 2 }
+                                }
+                };
+        }
 
         public Sprite(String obj, double x, double y, double z, double width, double height, double depth) {
                 super();
@@ -43,448 +497,19 @@ public class Sprite extends Path2D.Double implements J3D {
         protected void generate(String obj, double x, double y, double z, double width, double height, double depth) {
                 switch (obj) {
                         case "cube":
-                                coords = new double[][][] {
-                                                {
-                                                                { x, y, z },
-                                                                { x + width, y, z },
-                                                                { x + width, y + height, z },
-                                                                { x, y + height, z }
-                                                },
-                                                {
-                                                                { x, y, z },
-                                                                { x, y, z + depth },
-                                                                { x, y + height, z + depth },
-                                                                { x, y + height, z }
-                                                },
-                                                {
-                                                                { x, y + height, z },
-                                                                { x, y + height, z + depth },
-                                                                { x + width, y + height, z + depth },
-                                                                { x + width, y + height, z }
-                                                },
-                                                {
-                                                                { x + width, y + height, z },
-                                                                { x + width, y + height, z + depth },
-                                                                { x + width, y, z + depth },
-                                                                { x + width, y, z }
-                                                },
-                                                {
-                                                                { x + width, y, z },
-                                                                { x, y, z },
-                                                                { x, y, z + depth },
-                                                                { x + width, y, z + depth }
-                                                },
-                                                {
-                                                                { x + width, y, z + depth },
-                                                                { x + width, y + height, z + depth },
-                                                                { x, y + height, z + depth },
-                                                                { x, y, z + depth }
-                                                }
-                                };
+                                coords = Sprite.cube(x, y, z, width, height, depth);
                                 break;
                         case "tetrahedron":
-                                coords = new double[][][] {
-                                                {
-                                                                { x + width, y + height, z + depth },
-                                                                { x + width, y, z },
-                                                                { x, y + height, z }
-                                                },
-                                                {
-                                                                { x + width, y + height, z + depth },
-                                                                { x + width, y, z },
-                                                                { x, y, z + depth }
-                                                },
-                                                {
-                                                                { x + width, y + height, z + depth },
-                                                                { x, y + height, z },
-                                                                { x, y, z + depth }
-                                                },
-                                                {
-                                                                { x + width, y, z },
-                                                                { x, y + height, z },
-                                                                { x, y, z + depth }
-                                                }
-                                };
+                                coords = Sprite.tetrahedron(x, y, z, width, height, depth);
                                 break;
                         case "octahedron":
-                                coords = new double[][][] {
-                                                {
-                                                                { x, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z }
-                                                },
-                                                {
-                                                                { x, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z + depth }
-                                                },
-                                                {
-                                                                { x + width, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z }
-                                                },
-                                                {
-                                                                { x + width, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z + depth }
-                                                },
-                                                {
-                                                                { x, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y + height, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z }
-                                                },
-                                                {
-                                                                { x, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y + height, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z + depth }
-                                                },
-                                                {
-                                                                { x + width, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y + height, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z }
-                                                },
-                                                {
-                                                                { x + width, y + height / 2, z + depth / 2 },
-                                                                { x + width / 2, y + height, z + depth / 2 },
-                                                                { x + width / 2, y + height / 2, z + depth }
-                                                }
-                                };
+                                coords = Sprite.octahedron(x, y, z, width, height, depth);
                                 break;
                         case "dodecahedron":
-                                coords = new double[][][] {
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x, y + height * (Math.sqrt(5) - 1) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width, y + height * (Math.sqrt(5) - 1) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
-                                                                                z + depth }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
-                                                                                z }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x, y + height * (5 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width, y + height * (5 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (5 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
-                                                                                z + depth }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (Math.sqrt(5) - 1) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
-                                                                                z }
-                                                },
-                                                {
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width, y + height * (5 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x + width, y + height * (Math.sqrt(5) - 1) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (5 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width, y + height * (5 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x + width, y + height * (Math.sqrt(5) - 1) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x, y + height * (5 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x, y + height * (Math.sqrt(5) - 1) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (Math.sqrt(5) - 1) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4,
-                                                                                y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x, y + height * (5 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x, y + height * (Math.sqrt(5) - 1) / 4,
-                                                                                z + depth / 2 }
-                                                }
-                                };
+                                coords = Sprite.dodecahedron(x, y, z, width, height, depth);
                                 break;
                         case "icosahedron":
-                                coords = new double[][][] {
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z }
-                                                },
-                                                {
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z }
-                                                },
-                                                {
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth }
-                                                },
-                                                {
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth }
-                                                },
-                                                {
-                                                                { x + width, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth }
-                                                },
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (1 + Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width / 2, y,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (3 - Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z },
-                                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x + width / 2, y + height,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth }
-                                                },
-                                                {
-                                                                { x + width / 2, y,
-                                                                                z + depth * (1 + Math.sqrt(5)) / 4 },
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                },
-                                                {
-                                                                { x + width * (3 - Math.sqrt(5)) / 4, y + height / 2,
-                                                                                z + depth },
-                                                                { x, y + height * (1 + Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 },
-                                                                { x, y + height * (3 - Math.sqrt(5)) / 4,
-                                                                                z + depth / 2 }
-                                                }
-                                };
+                                coords = Sprite.icosahedron(x, y, z, width, height, depth);
                                 break;
                         default:
                                 System.out.println("Incorrect String Argument");
@@ -620,7 +645,7 @@ public class Sprite extends Path2D.Double implements J3D {
         }
 
         public void rotate(double theta_x, double theta_y, double theta_z) {
-                for (int face = 0; face < coords.length; face++) {
+                for (int face = 0; face < coords.length; face++)
                         for (int point = 0; point < coords[face].length; point++)
                                 try {
                                         coords[face][point][0] -= center_x;
@@ -632,8 +657,7 @@ public class Sprite extends Path2D.Double implements J3D {
                                         coords[face][point][2] += center_z;
                                 } catch (NullPointerException e) {
                                 }
-                        regenPolygon();
-                }
+                regenPolygon();
         }
 
         protected void regenPolygon() {
@@ -670,46 +694,46 @@ public class Sprite extends Path2D.Double implements J3D {
                 center_z = center[2];
         }
         /*
-        public static void main(String[] args) {
-                JFrame frame = new JFrame();
-                frame.setContentPane(new Container() {
-                        Point lastPoint;
-                        Sprite sprite1 = new Sprite("cube", 225, 200, 0, 50, 50, 50);
-                        Sprite sprite2 = new Sprite("icosahedron", 25, 25, 0, 50, 50, 50);
-                        Sprite sprite3 = new Sprite("dodecahedron", 425, 400, 0, 50, 50, 50);
-                        Sprite sprite4 = new Sprite("octahedron", 25, 400, 0, 50, 50, 50);
-                        Sprite sprite5 = new Sprite("tetrahedron", 425, 25, 0, 50, 50, 50);
-
-                        @Override
-                        public void paint(Graphics g) {
-                                super.paint(g);
-                                Point point = MouseInfo.getPointerInfo().getLocation();
-                                SwingUtilities.convertPointFromScreen(point, this);
-                                if (lastPoint != null) {
-                                        Graphics2D g2 = (Graphics2D) g;
-                                        sprite1.rotate(point.getY() - lastPoint.getY(),
-                                                        -point.getX() + lastPoint.getX(), 0);
-                                        g2.draw(sprite1);
-                                        sprite2.rotate(point.getY() - lastPoint.getY(),
-                                                        -point.getX() + lastPoint.getX(), 0);
-                                        g2.draw(sprite2);
-                                        sprite3.rotate(point.getY() - lastPoint.getY(),
-                                                        -point.getX() + lastPoint.getX(), 0);
-                                        g2.draw(sprite3);
-                                        sprite4.rotate(point.getY() - lastPoint.getY(),
-                                                        -point.getX() + lastPoint.getX(), 0);
-                                        g2.draw(sprite4);
-                                        sprite5.rotate(point.getY() - lastPoint.getY(),
-                                                        -point.getX() + lastPoint.getX(), 0);
-                                        g2.draw(sprite5);
-                                }
-                                lastPoint = point;
-                                repaint();
-                        }
-                });
-                frame.setSize(500, 500);
-                frame.setVisible(true);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        }
-        */
+         * public static void main(String[] args) {
+         * JFrame frame = new JFrame();
+         * frame.setContentPane(new Container() {
+         * Point lastPoint;
+         * Sprite sprite1 = new Sprite("cube", 225, 200, 0, 50, 50, 50);
+         * Sprite sprite2 = new Sprite("icosahedron", 25, 25, 0, 50, 50, 50);
+         * Sprite sprite3 = new Sprite("dodecahedron", 425, 400, 0, 50, 50, 50);
+         * Sprite sprite4 = new Sprite("octahedron", 25, 400, 0, 50, 50, 50);
+         * Sprite sprite5 = new Sprite("tetrahedron", 425, 25, 0, 50, 50, 50);
+         * 
+         * @Override
+         * public void paint(Graphics g) {
+         * super.paint(g);
+         * Point point = MouseInfo.getPointerInfo().getLocation();
+         * SwingUtilities.convertPointFromScreen(point, this);
+         * if (lastPoint != null) {
+         * Graphics2D g2 = (Graphics2D) g;
+         * sprite1.rotate(point.getY() - lastPoint.getY(),
+         * -point.getX() + lastPoint.getX(), 0);
+         * g2.draw(sprite1);
+         * sprite2.rotate(point.getY() - lastPoint.getY(),
+         * -point.getX() + lastPoint.getX(), 0);
+         * g2.draw(sprite2);
+         * sprite3.rotate(point.getY() - lastPoint.getY(),
+         * -point.getX() + lastPoint.getX(), 0);
+         * g2.draw(sprite3);
+         * sprite4.rotate(point.getY() - lastPoint.getY(),
+         * -point.getX() + lastPoint.getX(), 0);
+         * g2.draw(sprite4);
+         * sprite5.rotate(point.getY() - lastPoint.getY(),
+         * -point.getX() + lastPoint.getX(), 0);
+         * g2.draw(sprite5);
+         * }
+         * lastPoint = point;
+         * repaint();
+         * }
+         * });
+         * frame.setSize(500, 500);
+         * frame.setVisible(true);
+         * frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+         * }
+         */
 }
