@@ -1,7 +1,7 @@
 package App.Control;
 
 import App.Model.Model;
-import App.View.J3D;
+import App.Model.J3D;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;

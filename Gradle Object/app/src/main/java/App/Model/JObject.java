@@ -1,4 +1,4 @@
-package App.View;
+package App.Model;
 
 // import javax.swing.JFrame;
 import java.awt.Color;
@@ -402,6 +402,11 @@ public class JObject extends Container implements J3D {
             o.rotate(theta_x, theta_y, theta_z);
     }
 
+    public void irotate(double theta_x, double theta_y, double theta_z) {
+        for (Sprite o : sprites)
+            o.irotate(theta_x, theta_y, theta_z);
+    }
+
     public double getDepth() {
         double avg = 0;
         for (Sprite sprite : sprites)
@@ -421,6 +426,22 @@ public class JObject extends Container implements J3D {
 
     public double[] getCenter() {
         return new double[] { center_x, center_y, center_z };
+    }
+
+    public double[] calcCenter() {
+        double[] center = new double[] {0, 0, 0};
+        int vertices = 0;
+        for (Sprite sprite : sprites) {
+            double[] sprite_center = sprite.calcCenter();
+            center[0] += sprite_center[0];
+            center[1] += sprite_center[1];
+            center[2] += sprite_center[2];
+            vertices++;
+        }
+        center[0] /= vertices;
+        center[1] /= vertices;
+        center[2] /= vertices;
+        return center;
     }
 
     public void setPosition(double x, double y, double z) {

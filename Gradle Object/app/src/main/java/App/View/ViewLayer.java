@@ -1,16 +1,18 @@
 package App.View;
 
+import App.Model.J3D;
+import App.Model.JObject;
+import App.Model.Sprite;
+
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Arrays;
-
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import App.Control.Control;
 
 public class ViewLayer extends JFrame implements View {
-    protected J3D[] objs;
     protected JLayeredPane pane = new JLayeredPane();
     protected Container container;
 
@@ -33,7 +35,6 @@ public class ViewLayer extends JFrame implements View {
         addMouseWheelListener(control);
         pane.setLayout(null);
         pane.setSize(width, height);
-        this.objs = objs;
         for (J3D o : objs)
             if (o instanceof JObject) {
                 pane.add((JObject) o, JLayeredPane.DEFAULT_LAYER);
@@ -51,13 +52,11 @@ public class ViewLayer extends JFrame implements View {
         };
         container.setSize(width, height);
         pane.add(this.container, JLayeredPane.DEFAULT_LAYER);
-        rotate(0, 0, 0);
         add(pane);
+        draw(objs);
     }
 
-    public void rotate(double theta_x, double theta_y, double theta_z) {
-        for (J3D o : objs)
-            o.rotate(theta_x, theta_y, theta_z);
+    public void draw(J3D[] objs) {
         Arrays.sort(objs, (a, b) -> (int) (-a.getDepth() + b.getDepth()));
         for (J3D o : objs)
             if (o instanceof JObject) {

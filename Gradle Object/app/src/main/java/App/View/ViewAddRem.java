@@ -1,15 +1,17 @@
 package App.View;
 
+import App.Model.J3D;
+import App.Model.JObject;
+import App.Model.Sprite;
+
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Arrays;
-
 import javax.swing.JFrame;
 import App.Control.Control;
 
 public class ViewAddRem extends JFrame implements View {
-    protected J3D[] objs;
     protected Container container;
 
     public ViewAddRem(Control control, J3D[] objs) {
@@ -29,7 +31,6 @@ public class ViewAddRem extends JFrame implements View {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         addMouseMotionListener(control);
         addMouseWheelListener(control);
-        this.objs = objs;
         for (J3D o : objs)
             if (o instanceof JObject) {
                 add((JObject) o);
@@ -47,15 +48,14 @@ public class ViewAddRem extends JFrame implements View {
         };
         container.setSize(width, height);
         add(container);
-        rotate(0, 0, 0);
+        draw(objs);
     }
 
-    public void rotate(double theta_x, double theta_y, double theta_z) {
+    public void draw(J3D[] objs) {
         remove(container);
         for (J3D o : objs) {
             if (o instanceof JObject)
                 remove((JObject) o);
-            o.rotate(theta_x, theta_y, theta_z);
         }
         Arrays.sort(objs, (a, b) -> (int) (a.getDepth() - b.getDepth()));
         for (J3D o : objs) {

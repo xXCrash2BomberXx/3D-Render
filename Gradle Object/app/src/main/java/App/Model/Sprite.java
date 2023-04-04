@@ -1,4 +1,4 @@
-package App.View;
+package App.Model;
 
 // import javax.swing.JFrame;
 // import java.awt.Container;
@@ -15,6 +15,9 @@ public class Sprite extends Path2D.Double implements J3D {
         protected double center_x = 0;
         protected double center_y = 0;
         protected double center_z = 0;
+        protected double theta_x = 0;
+        protected double theta_y = 0;
+        protected double theta_z = 0;
         protected Boolean auto = true;
 
         public static double[][][] cube(double x, double y, double z,
@@ -520,7 +523,7 @@ public class Sprite extends Path2D.Double implements J3D {
                 regenPolygon();
         }
 
-        public static double getDepth(double[][] face) {
+        protected static double getDepth(double[][] face) {
                 double avg = 0;
                 for (double[] i : face)
                         try {
@@ -532,12 +535,12 @@ public class Sprite extends Path2D.Double implements J3D {
 
         public double getDepth() {
                 double avg = 0;
-                for (double[][] face : coords)
+                for (double[][] face : getRotated())
                         avg += getDepth(face);
                 return avg / coords.length;
         }
 
-        public static void rotatePoint(double[] vec, double theta_x, double theta_y, double theta_z) {
+        public static double[] rotatePoint(double[] vec, double theta_x, double theta_y, double theta_z) {
                 double x = vec[0] * Math.cos(theta_z * Math.PI / 180) * Math.cos(theta_y * Math.PI / 180) +
                                 vec[1] * Math.cos(theta_z * Math.PI / 180) * Math.sin(theta_y * Math.PI / 180)
                                                 * Math.sin(theta_x * Math.PI / 180)
@@ -559,9 +562,7 @@ public class Sprite extends Path2D.Double implements J3D {
                 double z = -vec[0] * Math.sin(theta_y * Math.PI / 180) +
                                 vec[1] * Math.cos(theta_y * Math.PI / 180) * Math.sin(theta_x * Math.PI / 180) +
                                 vec[2] * Math.cos(theta_y * Math.PI / 180) * Math.cos(theta_x * Math.PI / 180);
-                vec[0] = x;
-                vec[1] = y;
-                vec[2] = z;
+                return new double[] { x, y, z };
         }
 
         protected void increaseFaces() {
@@ -644,35 +645,58 @@ public class Sprite extends Path2D.Double implements J3D {
                 center_z /= vertices;
         }
 
-        public void rotate(double theta_x, double theta_y, double theta_z) {
+        public static double[][][] rotate(double[][][] coords, double theta_x, double theta_y, double theta_z) {
+                return Sprite.rotate(coords, theta_x, theta_y, theta_z, 0, 0, 0);
+        }
+
+        public static double[][][] rotate(double[][][] coords, double theta_x, double theta_y, double theta_z,
+                        double center_x, double center_y, double center_z) {
+                double[][][] rotated = new double[coords.length][coords[0].length][3];
                 for (int face = 0; face < coords.length; face++)
-                        for (int point = 0; point < coords[face].length; point++)
+                        for (int side = 0; side < coords[face].length; side++)
                                 try {
-                                        coords[face][point][0] -= center_x;
-                                        coords[face][point][1] -= center_y;
-                                        coords[face][point][2] -= center_z;
-                                        rotatePoint(coords[face][point], theta_x, theta_y, theta_z);
-                                        coords[face][point][0] += center_x;
-                                        coords[face][point][1] += center_y;
-                                        coords[face][point][2] += center_z;
+                                        coords[face][side][0] -= center_x;
+                                        coords[face][side][1] -= center_y;
+                                        coords[face][side][2] -= center_z;
+                                        rotated[face][side] = rotatePoint(coords[face][side], theta_x, theta_y,
+                                                        theta_z);
+                                        coords[face][side][0] += center_x;
+                                        coords[face][side][1] += center_y;
+                                        coords[face][side][2] += center_z;
+                                        rotated[face][side][0] += center_x;
+                                        rotated[face][side][1] += center_y;
+                                        rotated[face][side][2] += center_z;
                                 } catch (NullPointerException e) {
                                 }
+                return rotated;
+        }
+
+        public void rotate(double theta_x, double theta_y, double theta_z) {
+                this.theta_x = (this.theta_x + theta_x) % 360;
+                this.theta_y = (this.theta_y + theta_y) % 360;
+                this.theta_z = (this.theta_z + theta_z) % 360;
+                regenPolygon();
+        }
+
+        public void irotate(double theta_x, double theta_y, double theta_z) {
+                coords = Sprite.rotate(coords, theta_x, theta_y, theta_z, center_x, center_y, center_z);
                 regenPolygon();
         }
 
         protected void regenPolygon() {
+                double[][][] rotated = Sprite.rotate(coords, theta_x, theta_y, theta_z, center_x, center_y, center_z);
                 reset();
                 Boolean[] indeces = new Boolean[coords.length];
                 for (int loop = 0; loop < coords.length; loop++) {
                         int current = -1;
                         for (int index = 0; index < coords.length; index++)
                                 if (indeces[index] == null && (current == -1
-                                                || getDepth(coords[index]) >= getDepth(coords[current])))
+                                                || getDepth(rotated[index]) >= getDepth(rotated[current])))
                                         current = index;
-                        moveTo(coords[current][0][0], coords[current][0][1]);
+                        moveTo(rotated[current][0][0], rotated[current][0][1]);
                         for (int i = 1; i < coords[current].length; i++)
                                 try {
-                                        lineTo(coords[current][i][0], coords[current][i][1]);
+                                        lineTo(rotated[current][i][0], rotated[current][i][1]);
                                 } catch (NullPointerException e) {
                                 }
                         closePath();
@@ -684,8 +708,22 @@ public class Sprite extends Path2D.Double implements J3D {
                 return coords;
         }
 
+        public double[][][] getRotated() {
+                return Sprite.rotate(coords, theta_x, theta_y, theta_z, center_x, center_y, center_z);
+        }
+
         public double[] getCenter() {
                 return new double[] { center_x, center_y, center_z };
+        }
+
+        public double[] calcCenter() {
+            double[] center = new double[] {center_x, center_y, center_z};
+            autoCenter();
+            double[] center2 = new double[] {center_x, center_y, center_z};
+            center_x = center[0];
+            center_y = center[1];
+            center_z = center[2];
+            return center2;
         }
 
         public void setCenter(double[] center) {

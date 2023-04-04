@@ -1,5 +1,7 @@
 package App.View;
 
+import App.Model.J3D;
+
 public interface View {
-    public void rotate(double theta_x, double theta_y, double theta_z);
+    public void draw(J3D[] objs);
 }

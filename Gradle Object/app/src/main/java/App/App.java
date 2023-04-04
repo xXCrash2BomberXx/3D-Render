@@ -2,9 +2,9 @@ package App;
 
 import java.awt.Color;
 import App.Control.Control;
-import App.View.J3D;
-import App.View.JObject;
-import App.View.Sprite;
+import App.Model.J3D;
+import App.Model.JObject;
+import App.Model.Sprite;
 
 public class App {
     public static void main(String args[]) throws IllegalArgumentException {
