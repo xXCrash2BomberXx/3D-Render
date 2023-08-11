@@ -6,6 +6,38 @@
 class Object
 {
 private:
+	struct Prop
+	{
+		std::array<char, 4> fill = {0, 0, 0, 0};
+		std::array<char, 4> outline = {0, 0, 0, 0};
+		int thickness = 1;
+		bool useOutline = false;
+
+		void setFillColor(char r, char g, char b, char a)
+		{
+			fill[0] = r;
+			fill[1] = g;
+			fill[2] = b;
+			fill[3] = a;
+			if (!useOutline)
+			{
+				outline = fill;
+			}
+		}
+		void setOutlineColor(char r, char g, char b, char a)
+		{
+			useOutline = true;
+			outline[0] = r;
+			outline[1] = g;
+			outline[2] = b;
+			outline[3] = a;
+		}
+
+		void setOutlineThickness(int thick)
+		{
+			thickness = thick;
+		}
+	};
 	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon, double x, double y)
 	{
 		int n = polygon.size();
@@ -59,6 +91,82 @@ private:
 	}
 
 public:
+	static Object prism(unsigned int edges,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		std::vector<std::array<char, 4>> args{
+			{(char)255, 0, 0, (char)255},
+			{0, (char)255, 0, (char)255},
+			{0, 0, (char)255, (char)255},
+			{(char)255, (char)255, 0, (char)255},
+			{0, (char)255, (char)255, (char)255},
+			{(char)255, 0, (char)255, (char)255},
+			{0, 0, 0, (char)255},
+			{(char)127, (char)127, (char)127, (char)255},
+			{(char)127, 0, 0, (char)255},
+			{0, (char)127, 0, (char)255},
+			{0, 0, (char)127, (char)255},
+			{(char)127, (char)127, 0, (char)255},
+			{0, (char)127, (char)127, (char)255},
+			{(char)127, 0, (char)127, (char)255},
+			{(char)255, (char)127, (char)127, (char)255},
+			{(char)127, (char)255, (char)127, (char)255},
+			{(char)127, (char)127, (char)255, (char)255},
+			{(char)255, (char)255, (char)127, (char)255},
+			{(char)127, (char)255, (char)255, (char)255},
+			{(char)255, (char)127, (char)255, (char)255},
+		};
+		return prism(edges, args, x, y, z, width, height, depth);
+	}
+	static Object prism(unsigned int edges, std::vector<std::array<char, 4>> fill,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		std::vector<Prop> temp;
+		temp.reserve(fill.size());
+		for (auto color : fill)
+		{
+			Prop temp2;
+			temp2.setFillColor(color[0], color[1], color[2], color[3]);
+			temp.push_back(temp2);
+		}
+		return prism(edges, temp, x, y, z, width, height, depth);
+	}
+	static Object prism(unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		std::vector<Prop> temp;
+		temp.reserve(colors.size());
+		for (auto color : colors)
+		{
+			Prop temp2;
+			temp2.setOutlineColor(color[1][0], color[1][1], color[1][2], color[1][3]);
+			temp2.setFillColor(color[0][0], color[0][1], color[0][2], color[0][3]);
+			temp.push_back(temp2);
+		}
+		return prism(edges, temp, x, y, z, width, height, depth);
+	}
+	static Object prism(unsigned int edges, std::vector<Prop> args,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		Object temp;
+		temp.polygon.reserve(edges + 2);
+		for (unsigned int vertex = 0; vertex < edges; vertex++)
+		{
+			double angle = (vertex / static_cast<double>(edges)) * 2 * pi;
+			double curX = x + (cos(angle) + 1) / 2 * width;
+			double curY = y + (sin(angle) + 1) / 2 * height;
+			temp.addPoint(0, curX, curY, z);
+			temp.addPoint(1, curX, curY, z + depth);
+			temp.addPoint(vertex + 2, curX, curY, z);
+			temp.addPoint(vertex + 2, curX, curY, z + depth);
+			temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z + depth);
+			temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z);
+			temp.polygon[vertex + 2] = args[(vertex + 2) % args.size()];
+		}
+		temp.polygon[0] = args[0 % args.size()];
+		temp.polygon[1] = args[1 % args.size()];
+		return temp;
+	}
 	static Object cube(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		Object temp;
@@ -366,39 +474,6 @@ public:
 	}
 
 private:
-	struct Prop
-	{
-		std::array<char, 4> fill = {0, 0, 0, 0};
-		std::array<char, 4> outline = {0, 0, 0, 0};
-		int thickness = 1;
-		bool useOutline = false;
-
-		void setFillColor(char r, char g, char b, char a)
-		{
-			fill[0] = r;
-			fill[1] = g;
-			fill[2] = b;
-			fill[3] = a;
-			if (!useOutline)
-			{
-				outline = fill;
-			}
-		}
-
-		void setOutlineColor(char r, char g, char b, char a)
-		{
-			useOutline = true;
-			outline[0] = r;
-			outline[1] = g;
-			outline[2] = b;
-			outline[3] = a;
-		}
-
-		void setOutlineThickness(int thick)
-		{
-			thickness = thick;
-		}
-	};
 	std::vector<std::vector<std::array<double, 3>>> coords;
 	std::vector<Prop> polygon;
 	double center_x{0};
@@ -408,14 +483,24 @@ private:
 public:
 	bool borderless = false;
 	bool wireframe = false;
+	Object()
+	{
+	}
+	Object(std::vector<std::vector<std::array<double, 3>>> coords, double x_axis, double y_axis, double z_axis)
+	{
+		this->coords = coords;
+		center_x = x_axis;
+		center_y = y_axis;
+		center_z = z_axis;
+	}
 	void setPoint(int face, int index, double x, double y, double z, double a = 255)
 	{
-		if (face >= coords.size())
+		while (face >= coords.size())
 		{
 			coords.push_back(std::vector<std::array<double, 3>>{});
 			polygon.push_back(Prop());
 		}
-		if (index >= coords[face].size())
+		while (index >= coords[face].size())
 			coords[face].push_back(std::array<double, 3>{0, 0, 0});
 		coords[face][index][0] = x;
 		coords[face][index][1] = y;
@@ -425,7 +510,7 @@ public:
 	}
 	void addPoint(int face, double x, double y, double z)
 	{
-		if (face >= coords.size())
+		while (face >= coords.size())
 		{
 			coords.push_back(std::vector<std::array<double, 3>>{});
 			polygon.push_back(Prop());
@@ -483,6 +568,12 @@ public:
 		center_y /= vertices;
 		center_z /= vertices;
 	}
+	void setCenter(double x, double y, double z)
+	{
+		center_x = x;
+		center_y = y;
+		center_z = z;
+	}
 	void rotate(double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		for (int face{0}; face < coords.size(); face++)
@@ -523,19 +614,19 @@ public:
 			if (!borderless)
 			{
 				SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].outline[1],
-									polygon[current].outline[2], polygon[current].outline[3]);
+									   polygon[current].outline[2], polygon[current].outline[3]);
 				for (int index{0}; index < coords[current].size(); index++)
 					if (index == coords[current].size() - 1)
 						SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
-										coords[current][0][0], coords[current][0][1]);
+										   coords[current][0][0], coords[current][0][1]);
 					else
 						SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
-										coords[current][index + 1][0], coords[current][index + 1][1]);
+										   coords[current][index + 1][0], coords[current][index + 1][1]);
 			}
 			if (!wireframe)
 			{
 				SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].fill[1],
-									polygon[current].fill[2], polygon[current].fill[3]);
+									   polygon[current].fill[2], polygon[current].fill[3]);
 				for (double x{minmax[0]}; x < minmax[2]; x++)
 					for (double y{minmax[1]}; y < minmax[3]; y++)
 						if (isInsidePolygon(coords[current], x, y))
@@ -572,11 +663,17 @@ int main(int argc, char *argv[])
 	}
 
 	Object polygons[] = {
-		Object::icosahedron(50, 50, 50, 100, 100, 100),
-		Object::cube(200, 200, 200, 50, 50, 50)
-	};
-	polygons[0].wireframe = true;
-	
+		Object::cube(200, 200, 0, 50, 50, 50),
+		Object::prism(6, 50, 50, 0, 50, 50, 50),  // pyramid
+		Object::prism(5, 400, 50, 0, 50, 50, 50), // wireframe
+		Object::prism(6,
+					  std::vector<std::array<char, 4>>{
+						  {(char)255, 0, 0, (char)255},
+						  {0, 0, (char)255, (char)255}},
+					  400, 400, 0, 50, 50, 50), // pyramid, red/blue
+		Object::icosahedron(50, 400, 0, 50, 50, 50)};
+	polygons[2].wireframe = true;
+
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
 	for (Object polygon : polygons)
