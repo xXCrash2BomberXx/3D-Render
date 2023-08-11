@@ -5,14 +5,37 @@
 
 class Object
 {
-	static double getDepth(std::vector<std::array<double, 4>> face)
+private:
+	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon, double x, double y)
+	{
+		int n = polygon.size();
+		int cnt = 0;
+
+		for (int i = 0; i < n; i++)
+		{
+			const std::array<double, 3> &p1 = polygon[i];
+			const std::array<double, 3> &p2 = polygon[(i + 1) % n];
+
+			if ((p1[1] <= y && p2[1] <= y) || (p1[1] > y && p2[1] > y))
+				continue;
+
+			double xIntersection = (p1[0] * (p2[1] - y) + p2[0] * (y - p1[1])) / (p2[1] - p1[1]);
+
+			if (xIntersection > x)
+				cnt++;
+		}
+
+		return cnt % 2 == 1;
+	}
+
+	static double getDepth(std::vector<std::array<double, 3>> face)
 	{
 		double avg{0};
 		for (auto i : face)
 			avg += i[2];
 		return avg / face.size();
 	}
-	static void rotatePoint(std::array<double, 4> &vec, double theta_x, double theta_y, double theta_z)
+	static void rotatePoint(std::array<double, 3> &vec, double theta_x, double theta_y, double theta_z)
 	{
 		double x{
 			vec[0] * cos(theta_z * pi / 180) * cos(theta_y * pi / 180) +
@@ -78,7 +101,6 @@ public:
 		return temp;
 	}
 
-public:
 	static Object tetrahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		Object temp;
@@ -104,7 +126,6 @@ public:
 		return temp;
 	}
 
-public:
 	static Object octahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		Object temp;
@@ -150,7 +171,6 @@ public:
 		return temp;
 	}
 
-public:
 	static Object dodecahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		Object temp;
@@ -240,7 +260,6 @@ public:
 		return temp;
 	}
 
-public:
 	static Object icosahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		Object temp;
@@ -352,6 +371,7 @@ private:
 		std::array<char, 4> fill = {0, 0, 0, 0};
 		std::array<char, 4> outline = {0, 0, 0, 0};
 		int thickness = 1;
+		bool useOutline = false;
 
 		void setFillColor(char r, char g, char b, char a)
 		{
@@ -359,10 +379,15 @@ private:
 			fill[1] = g;
 			fill[2] = b;
 			fill[3] = a;
+			if (!useOutline)
+			{
+				outline = fill;
+			}
 		}
 
 		void setOutlineColor(char r, char g, char b, char a)
 		{
+			useOutline = true;
 			outline[0] = r;
 			outline[1] = g;
 			outline[2] = b;
@@ -374,36 +399,38 @@ private:
 			thickness = thick;
 		}
 	};
-	std::vector<std::vector<std::array<double, 4>>> coords;
+	std::vector<std::vector<std::array<double, 3>>> coords;
 	std::vector<Prop> polygon;
 	double center_x{0};
 	double center_y{0};
 	double center_z{0};
 
 public:
+	bool borderless = false;
+	bool wireframe = false;
 	void setPoint(int face, int index, double x, double y, double z, double a = 255)
 	{
 		if (face >= coords.size())
 		{
-			coords.push_back(std::vector<std::array<double, 4>>{});
+			coords.push_back(std::vector<std::array<double, 3>>{});
 			polygon.push_back(Prop());
 		}
 		if (index >= coords[face].size())
-			coords[face].push_back(std::array<double, 4>{0, 0, 0, 0});
+			coords[face].push_back(std::array<double, 3>{0, 0, 0});
 		coords[face][index][0] = x;
 		coords[face][index][1] = y;
 		coords[face][index][2] = z;
 		coords[face][index][3] = a;
 		autoCenter();
 	}
-	void addPoint(int face, double x, double y, double z, double a = 255)
+	void addPoint(int face, double x, double y, double z)
 	{
 		if (face >= coords.size())
 		{
-			coords.push_back(std::vector<std::array<double, 4>>{});
+			coords.push_back(std::vector<std::array<double, 3>>{});
 			polygon.push_back(Prop());
 		}
-		coords[face].push_back(std::array<double, 4>{x, y, z, a});
+		coords[face].push_back(std::array<double, 3>{x, y, z});
 		autoCenter();
 	}
 	void setColor(int face, char r, char g, char b, char a = 255)
@@ -473,21 +500,47 @@ public:
 	void draw(SDL_Renderer *window) const
 	{
 		std::vector<bool> indeces(coords.size(), false);
+		std::array<double, 4> minmax = {coords[0][0][0], coords[0][0][1], coords[0][0][0], coords[0][0][1]};
+		if (!wireframe)
+			for (auto face : coords)
+				for (auto point : face)
+				{
+					if (point[0] < minmax[0])
+						minmax[0] = point[0];
+					else if (point[0] > minmax[2])
+						minmax[2] = point[0];
+					if (point[1] < minmax[1])
+						minmax[1] = point[1];
+					else if (point[1] > minmax[3])
+						minmax[3] = point[1];
+				}
 		for (int loop{0}; loop < coords.size(); loop++)
 		{
 			int current{-1};
 			for (int index{0}; index < coords.size(); index++)
 				if (((current != -1) ? (getDepth(coords[index]) >= getDepth(coords[current])) : true) && !indeces[index])
 					current = index;
-			SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].fill[1],
-								   polygon[current].fill[2], polygon[current].fill[3]);
-			for (int index{0}; index < coords[current].size(); index++)
-				if (index == coords[current].size() - 1)
-					SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
-									   coords[current][0][0], coords[current][0][1]);
-				else
-					SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
-									   coords[current][index + 1][0], coords[current][index + 1][1]);
+			if (!borderless)
+			{
+				SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].outline[1],
+									polygon[current].outline[2], polygon[current].outline[3]);
+				for (int index{0}; index < coords[current].size(); index++)
+					if (index == coords[current].size() - 1)
+						SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
+										coords[current][0][0], coords[current][0][1]);
+					else
+						SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
+										coords[current][index + 1][0], coords[current][index + 1][1]);
+			}
+			if (!wireframe)
+			{
+				SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].fill[1],
+									polygon[current].fill[2], polygon[current].fill[3]);
+				for (double x{minmax[0]}; x < minmax[2]; x++)
+					for (double y{minmax[1]}; y < minmax[3]; y++)
+						if (isInsidePolygon(coords[current], x, y))
+							SDL_RenderDrawPoint(window, x, y);
+			}
 			indeces[current] = true;
 		}
 	}
@@ -522,6 +575,8 @@ int main(int argc, char *argv[])
 		Object::icosahedron(50, 50, 50, 100, 100, 100),
 		Object::cube(200, 200, 200, 50, 50, 50)
 	};
+	polygons[0].wireframe = true;
+	
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
 	for (Object polygon : polygons)
