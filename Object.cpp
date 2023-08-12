@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <array>
+#include <cmath>
 #define pi 3.14159265358979323846
 
 class Object
