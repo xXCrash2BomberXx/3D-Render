@@ -91,7 +91,21 @@ private:
 	}
 
 public:
+	enum ObjectType {
+		Pyramid,
+		Prism
+	};
+	static Object pyramid(unsigned int edges,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		return generate(ObjectType::Pyramid, edges, x, y, z, width, height, depth);
+	}
 	static Object prism(unsigned int edges,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		return generate(ObjectType::Prism, edges, x, y, z, width, height, depth);
+	}
+	static Object generate(ObjectType objectType, unsigned int edges,
 						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<std::array<char, 4>> args{
@@ -116,9 +130,19 @@ public:
 			{(char)127, (char)255, (char)255, (char)255},
 			{(char)255, (char)127, (char)255, (char)255},
 		};
-		return prism(edges, args, x, y, z, width, height, depth);
+		return generate(objectType, edges, args, x, y, z, width, height, depth);
+	}
+	static Object pyramid(unsigned int edges, std::vector<std::array<char, 4>> fill,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		return generate(ObjectType::Pyramid, edges, fill, x, y, z, width, height, depth);
 	}
 	static Object prism(unsigned int edges, std::vector<std::array<char, 4>> fill,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		return generate(ObjectType::Prism, edges, fill, x, y, z, width, height, depth);
+	}
+	static Object generate(ObjectType objectType, unsigned int edges, std::vector<std::array<char, 4>> fill,
 						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<Prop> temp;
@@ -129,9 +153,19 @@ public:
 			temp2.setFillColor(color[0], color[1], color[2], color[3]);
 			temp.push_back(temp2);
 		}
-		return prism(edges, temp, x, y, z, width, height, depth);
+		return generate(objectType, edges, temp, x, y, z, width, height, depth);
+	}
+	static Object pyramid(unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		return generate(ObjectType::Pyramid, edges, colors, x, y, z, width, height, depth);
 	}
 	static Object prism(unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		return generate(ObjectType::Prism, edges, colors, x, y, z, width, height, depth);
+	}
+	static Object generate(ObjectType objectType, unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
 						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<Prop> temp;
@@ -143,28 +177,58 @@ public:
 			temp2.setFillColor(color[0][0], color[0][1], color[0][2], color[0][3]);
 			temp.push_back(temp2);
 		}
-		return prism(edges, temp, x, y, z, width, height, depth);
+		return generate(objectType, edges, temp, x, y, z, width, height, depth);
+	}
+	static Object pyramid(unsigned int edges, std::vector<Prop> args,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
+		return generate(ObjectType::Pyramid, edges, args, x, y, z, width, height, depth);
 	}
 	static Object prism(unsigned int edges, std::vector<Prop> args,
 						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
+		return generate(ObjectType::Prism, edges, args, x, y, z, width, height, depth);
+	}
+	static Object generate(ObjectType objectType, unsigned int edges, std::vector<Prop> args,
+						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	{
 		Object temp;
-		temp.polygon.reserve(edges + 2);
-		for (unsigned int vertex = 0; vertex < edges; vertex++)
+		switch (objectType)
 		{
-			double angle = (vertex / static_cast<double>(edges)) * 2 * pi;
-			double curX = x + (cos(angle) + 1) / 2 * width;
-			double curY = y + (sin(angle) + 1) / 2 * height;
-			temp.addPoint(0, curX, curY, z);
-			temp.addPoint(1, curX, curY, z + depth);
-			temp.addPoint(vertex + 2, curX, curY, z);
-			temp.addPoint(vertex + 2, curX, curY, z + depth);
-			temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z + depth);
-			temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z);
-			temp.polygon[vertex + 2] = args[(vertex + 2) % args.size()];
+		case ObjectType::Prism:
+			temp.polygon.reserve(edges + 2);
+			for (unsigned int vertex = 0; vertex < edges; vertex++)
+			{
+				double angle = (vertex / static_cast<double>(edges)) * 2 * pi;
+				double curX = x + (cos(angle) + 1) / 2 * width;
+				double curY = y + (sin(angle) + 1) / 2 * height;
+				temp.addPoint(0, curX, curY, z);
+				temp.addPoint(1, curX, curY, z + depth);
+				temp.addPoint(vertex + 2, curX, curY, z);
+				temp.addPoint(vertex + 2, curX, curY, z + depth);
+				temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z + depth);
+				temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z);
+				temp.polygon[vertex + 2] = args[(vertex + 2) % args.size()];
+			}
+			temp.polygon[0] = args[0 % args.size()];
+			temp.polygon[1] = args[1 % args.size()];
+			break;
+		case ObjectType::Pyramid:
+			temp.polygon.reserve(edges + 1);
+			for (unsigned int vertex = 0; vertex < edges; vertex++)
+			{
+				double angle = (vertex / static_cast<double>(edges)) * 2 * pi;
+				double curX = x + (cos(angle) + 1) / 2 * width;
+				double curY = y + (sin(angle) + 1) / 2 * height;
+				temp.addPoint(0, curX, curY, z);
+				temp.addPoint(vertex + 1, curX, curY, z);
+				temp.addPoint(vertex + 1, x + width / 2, y + height / 2, z + depth);
+				temp.addPoint(vertex + 1, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z);
+				temp.polygon[vertex + 1] = args[(vertex + 1) % args.size()];
+			}
+			temp.polygon[0] = args[0 % args.size()];
+			break;
 		}
-		temp.polygon[0] = args[0 % args.size()];
-		temp.polygon[1] = args[1 % args.size()];
 		return temp;
 	}
 	static Object cube(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
@@ -664,9 +728,9 @@ int main(int argc, char *argv[])
 
 	Object polygons[] = {
 		Object::cube(200, 200, 0, 50, 50, 50),
-		Object::prism(6, 50, 50, 0, 50, 50, 50),  // pyramid
-		Object::prism(5, 400, 50, 0, 50, 50, 50), // wireframe
-		Object::prism(6,
+		Object::pyramid(6, 50, 50, 0, 50, 50, 50),
+		Object::prism(5, 400, 50, 0, 50, 50, 50),
+		Object::pyramid(6,
 					  std::vector<std::array<char, 4>>{
 						  {(char)255, 0, 0, (char)255},
 						  {0, 0, (char)255, (char)255}},
