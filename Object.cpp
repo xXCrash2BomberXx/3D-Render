@@ -726,6 +726,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+
 	Object polygons[] = {
 		Object::cube(200, 200, 0, 50, 50, 50),
 		Object::pyramid(6, 50, 50, 0, 50, 50, 50),
@@ -746,18 +748,26 @@ int main(int argc, char *argv[])
 
 	bool quit = false;
 	SDL_Event event;
+	int mouseX = 0;
+	int mouseY = 0;
 
 	while (!quit)
 	{
 		// Event loop
 		while (SDL_PollEvent(&event) != 0)
 		{
-			if (event.type == SDL_QUIT)
+			switch (event.type)
 			{
+			case SDL_QUIT:
 				quit = true;
-			}
-			else if (event.type == SDL_KEYDOWN)
-			{
+				break;
+			case SDL_MOUSEMOTION:
+				for (Object &polygon : polygons)
+					polygon.rotate(-mouseY+event.motion.y, mouseX-event.motion.x, 0);
+				mouseX = event.motion.x;
+				mouseY = event.motion.y;
+				break;
+			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_ESCAPE:
@@ -783,9 +793,21 @@ int main(int argc, char *argv[])
 					for (Object &polygon : polygons)
 						polygon.rotate(0, -20, 0);
 					break;
+				case SDLK_LSHIFT:
+				case SDLK_RSHIFT:
+					for (Object &polygon : polygons)
+						polygon.rotate(0, 0, -20);
+					break;
+				case SDLK_SPACE:
+					for (Object &polygon : polygons)
+						polygon.rotate(0, 0, 20);
+					break;
 				default:
 					break;
 				}
+				break;
+			default:
+				break;
 			}
 			if (!quit)
 			{
