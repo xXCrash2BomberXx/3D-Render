@@ -62,7 +62,7 @@ private:
 		return cnt % 2 == 1;
 	}
 
-	static double getDepth(std::vector<std::array<double, 3>> face)
+	static double getDepth(const std::vector<std::array<double, 3>> &face)
 	{
 		double avg{0};
 		for (auto i : face)
@@ -140,19 +140,19 @@ public:
 		return generate(objectType, edges, args, x, y, z, width, height, depth);
 	}
 
-	static Object pyramid(unsigned int edges, std::vector<std::array<char, 4>> fill,
+	static Object pyramid(unsigned int edges, const std::vector<std::array<char, 4>> &fill,
 						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Pyramid, edges, fill, x, y, z, width, height, depth);
 	}
 
-	static Object prism(unsigned int edges, std::vector<std::array<char, 4>> fill,
+	static Object prism(unsigned int edges, const std::vector<std::array<char, 4>> &fill,
 						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Prism, edges, fill, x, y, z, width, height, depth);
 	}
 
-	static Object generate(ObjectType objectType, unsigned int edges, std::vector<std::array<char, 4>> fill,
+	static Object generate(ObjectType objectType, unsigned int edges, const std::vector<std::array<char, 4>> &fill,
 						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<Prop> temp;
@@ -166,19 +166,19 @@ public:
 		return generate(objectType, edges, temp, x, y, z, width, height, depth);
 	}
 
-	static Object pyramid(unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
+	static Object pyramid(unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
 						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Pyramid, edges, colors, x, y, z, width, height, depth);
 	}
 
-	static Object prism(unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
+	static Object prism(unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
 						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Prism, edges, colors, x, y, z, width, height, depth);
 	}
 
-	static Object generate(ObjectType objectType, unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
+	static Object generate(ObjectType objectType, unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
 						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<Prop> temp;
@@ -193,19 +193,19 @@ public:
 		return generate(objectType, edges, temp, x, y, z, width, height, depth);
 	}
 
-	static Object pyramid(unsigned int edges, std::vector<Prop> args,
+	static Object pyramid(unsigned int edges, const std::vector<Prop> &args,
 						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Pyramid, edges, args, x, y, z, width, height, depth);
 	}
 
-	static Object prism(unsigned int edges, std::vector<Prop> args,
+	static Object prism(unsigned int edges, const std::vector<Prop> &args,
 						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Prism, edges, args, x, y, z, width, height, depth);
 	}
 
-	static Object generate(ObjectType objectType, unsigned int edges, std::vector<Prop> args,
+	static Object generate(ObjectType objectType, unsigned int edges, const std::vector<Prop> &args,
 						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		Object temp;
