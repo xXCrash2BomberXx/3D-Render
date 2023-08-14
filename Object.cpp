@@ -92,12 +92,13 @@ private:
 	}
 
 public:
-	enum ObjectType {
+	enum ObjectType
+	{
 		Pyramid,
 		Prism
 	};
 	static Object pyramid(unsigned int edges,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Pyramid, edges, x, y, z, width, height, depth);
 	}
@@ -107,7 +108,7 @@ public:
 		return generate(ObjectType::Prism, edges, x, y, z, width, height, depth);
 	}
 	static Object generate(ObjectType objectType, unsigned int edges,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<std::array<char, 4>> args{
 			{(char)255, 0, 0, (char)255},
@@ -134,7 +135,7 @@ public:
 		return generate(objectType, edges, args, x, y, z, width, height, depth);
 	}
 	static Object pyramid(unsigned int edges, std::vector<std::array<char, 4>> fill,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Pyramid, edges, fill, x, y, z, width, height, depth);
 	}
@@ -144,7 +145,7 @@ public:
 		return generate(ObjectType::Prism, edges, fill, x, y, z, width, height, depth);
 	}
 	static Object generate(ObjectType objectType, unsigned int edges, std::vector<std::array<char, 4>> fill,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<Prop> temp;
 		temp.reserve(fill.size());
@@ -157,7 +158,7 @@ public:
 		return generate(objectType, edges, temp, x, y, z, width, height, depth);
 	}
 	static Object pyramid(unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Pyramid, edges, colors, x, y, z, width, height, depth);
 	}
@@ -167,7 +168,7 @@ public:
 		return generate(ObjectType::Prism, edges, colors, x, y, z, width, height, depth);
 	}
 	static Object generate(ObjectType objectType, unsigned int edges, std::vector<std::array<std::array<char, 4>, 2>> colors,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		std::vector<Prop> temp;
 		temp.reserve(colors.size());
@@ -181,7 +182,7 @@ public:
 		return generate(objectType, edges, temp, x, y, z, width, height, depth);
 	}
 	static Object pyramid(unsigned int edges, std::vector<Prop> args,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		return generate(ObjectType::Pyramid, edges, args, x, y, z, width, height, depth);
 	}
@@ -191,7 +192,7 @@ public:
 		return generate(ObjectType::Prism, edges, args, x, y, z, width, height, depth);
 	}
 	static Object generate(ObjectType objectType, unsigned int edges, std::vector<Prop> args,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
 	{
 		Object temp;
 		switch (objectType)
@@ -728,16 +729,17 @@ int main(int argc, char *argv[])
 	}
 
 	SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	Object polygons[] = {
 		Object::cube(200, 200, 0, 50, 50, 50),
 		Object::pyramid(6, 50, 50, 0, 50, 50, 50),
 		Object::prism(5, 400, 50, 0, 50, 50, 50),
 		Object::pyramid(6,
-					  std::vector<std::array<char, 4>>{
-						  {(char)255, 0, 0, (char)255},
-						  {0, 0, (char)255, (char)255}},
-					  400, 400, 0, 50, 50, 50), // pyramid, red/blue
+						std::vector<std::array<char, 4>>{
+							{(char)255, 0, 0, (char)255},
+							{0, 0, (char)255, (char)255}},
+						400, 400, 0, 50, 50, 50), // pyramid, red/blue
 		Object::icosahedron(50, 400, 0, 50, 50, 50)};
 	polygons[2].wireframe = true;
 
@@ -754,7 +756,6 @@ int main(int argc, char *argv[])
 
 	while (!quit)
 	{
-		// Event loop
 		while (SDL_PollEvent(&event) != 0)
 		{
 			switch (event.type)
@@ -764,7 +765,7 @@ int main(int argc, char *argv[])
 				break;
 			case SDL_MOUSEMOTION:
 				for (Object &polygon : polygons)
-					polygon.rotate(-mouseY+event.motion.y, mouseX-event.motion.x, 0);
+					polygon.rotate(-mouseY + event.motion.y, mouseX - event.motion.x, 0);
 				mouseX = event.motion.x;
 				mouseY = event.motion.y;
 				break;
