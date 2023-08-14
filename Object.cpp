@@ -93,27 +93,34 @@ private:
 		vec[2] = z;
 	}
 
-public:
 	enum ObjectType
 	{
-		Pyramid,
-		Prism
+		pyramid,
+		prism
 	};
 
-	static Object pyramid(unsigned int edges,
-						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+public:
+	static Object Pyramid(unsigned int edges,
+						  double x = 0, double y = 0, double z = 0,
+						  double width = 1, double height = 1, double depth = 1,
+						  double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Pyramid, edges, x, y, z, width, height, depth);
+		return generate(ObjectType::pyramid, edges, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
-	static Object prism(unsigned int edges,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Prism(unsigned int edges,
+						double x = 0, double y = 0, double z = 0,
+						double width = 1, double height = 1, double depth = 1,
+						double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Prism, edges, x, y, z, width, height, depth);
+		return generate(ObjectType::prism, edges, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
+private:
 	static Object generate(ObjectType objectType, unsigned int edges,
-						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0,
+						   double width = 1, double height = 1, double depth = 1,
+						   double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		std::vector<std::array<char, 4>> args{
 			{(char)255, 0, 0, (char)255},
@@ -137,23 +144,31 @@ public:
 			{(char)127, (char)255, (char)255, (char)255},
 			{(char)255, (char)127, (char)255, (char)255},
 		};
-		return generate(objectType, edges, args, x, y, z, width, height, depth);
+		return generate(objectType, edges, args, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
-	static Object pyramid(unsigned int edges, const std::vector<std::array<char, 4>> &fill,
-						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+public:
+	static Object Pyramid(unsigned int edges, const std::vector<std::array<char, 4>> &fill,
+						  double x = 0, double y = 0, double z = 0,
+						  double width = 1, double height = 1, double depth = 1,
+						  double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Pyramid, edges, fill, x, y, z, width, height, depth);
+		return generate(ObjectType::pyramid, edges, fill, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
-	static Object prism(unsigned int edges, const std::vector<std::array<char, 4>> &fill,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Prism(unsigned int edges, const std::vector<std::array<char, 4>> &fill,
+						double x = 0, double y = 0, double z = 0,
+						double width = 1, double height = 1, double depth = 1,
+						double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Prism, edges, fill, x, y, z, width, height, depth);
+		return generate(ObjectType::prism, edges, fill, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
+private:
 	static Object generate(ObjectType objectType, unsigned int edges, const std::vector<std::array<char, 4>> &fill,
-						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0,
+						   double width = 1, double height = 1, double depth = 1,
+						   double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		std::vector<Prop> temp;
 		temp.reserve(fill.size());
@@ -163,23 +178,31 @@ public:
 			temp2.setFillColor(color[0], color[1], color[2], color[3]);
 			temp.push_back(temp2);
 		}
-		return generate(objectType, edges, temp, x, y, z, width, height, depth);
+		return generate(objectType, edges, temp, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
-	static Object pyramid(unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
-						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+public:
+	static Object Pyramid(unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
+						  double x = 0, double y = 0, double z = 0,
+						  double width = 1, double height = 1, double depth = 1,
+						  double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Pyramid, edges, colors, x, y, z, width, height, depth);
+		return generate(ObjectType::pyramid, edges, colors, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
-	static Object prism(unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Prism(unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
+						double x = 0, double y = 0, double z = 0,
+						double width = 1, double height = 1, double depth = 1,
+						double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Prism, edges, colors, x, y, z, width, height, depth);
+		return generate(ObjectType::prism, edges, colors, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
+private:
 	static Object generate(ObjectType objectType, unsigned int edges, const std::vector<std::array<std::array<char, 4>, 2>> &colors,
-						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0,
+						   double width = 1, double height = 1, double depth = 1,
+						   double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		std::vector<Prop> temp;
 		temp.reserve(colors.size());
@@ -190,28 +213,36 @@ public:
 			temp2.setFillColor(color[0][0], color[0][1], color[0][2], color[0][3]);
 			temp.push_back(temp2);
 		}
-		return generate(objectType, edges, temp, x, y, z, width, height, depth);
+		return generate(objectType, edges, temp, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
-	static Object pyramid(unsigned int edges, const std::vector<Prop> &args,
-						  double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+public:
+	static Object Pyramid(unsigned int edges, const std::vector<Prop> &args,
+						  double x = 0, double y = 0, double z = 0,
+						  double width = 1, double height = 1, double depth = 1,
+						  double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Pyramid, edges, args, x, y, z, width, height, depth);
+		return generate(ObjectType::pyramid, edges, args, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
-	static Object prism(unsigned int edges, const std::vector<Prop> &args,
-						double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Prism(unsigned int edges, const std::vector<Prop> &args,
+						double x = 0, double y = 0, double z = 0,
+						double width = 1, double height = 1, double depth = 1,
+						double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		return generate(ObjectType::Prism, edges, args, x, y, z, width, height, depth);
+		return generate(ObjectType::prism, edges, args, x, y, z, width, height, depth, theta_x, theta_y, theta_z);
 	}
 
+private:
 	static Object generate(ObjectType objectType, unsigned int edges, const std::vector<Prop> &args,
-						   double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+						   double x = 0, double y = 0, double z = 0,
+						   double width = 1, double height = 1, double depth = 1,
+						   double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		Object temp;
 		switch (objectType)
 		{
-		case ObjectType::Prism:
+		case ObjectType::prism:
 			temp.polygon.reserve(edges + 2);
 			temp.coords.reserve(edges + 2);
 
@@ -231,7 +262,7 @@ public:
 			temp.polygon[0] = args[0 % args.size()];
 			temp.polygon[1] = args[1 % args.size()];
 			break;
-		case ObjectType::Pyramid:
+		case ObjectType::pyramid:
 			temp.polygon.reserve(edges + 1);
 			temp.coords.reserve(edges + 1);
 
@@ -250,10 +281,14 @@ public:
 			break;
 		}
 
+		temp.rotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
-	static Object cube(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+public:
+	static Object Cube(double x = 0, double y = 0, double z = 0,
+					   double width = 1, double height = 1, double depth = 1,
+					   double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		Object temp;
 		temp.polygon.reserve(6);
@@ -295,10 +330,13 @@ public:
 		temp.addPoint(5, x, y, z + depth);
 		temp.setColor(5, 255, 0, 255, 255); // Magenta
 
+		temp.rotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
-	static Object tetrahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Tetrahedron(double x = 0, double y = 0, double z = 0,
+							  double width = 1, double height = 1, double depth = 1,
+							  double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		Object temp;
 		temp.polygon.reserve(4);
@@ -324,10 +362,13 @@ public:
 		temp.addPoint(3, x, y, z + depth);
 		temp.setColor(3, 255, 255, 0, 255); // Yellow
 
+		temp.rotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
-	static Object octahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Octahedron(double x = 0, double y = 0, double z = 0,
+							 double width = 1, double height = 1, double depth = 1,
+							 double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		Object temp;
 		temp.polygon.reserve(8);
@@ -373,10 +414,13 @@ public:
 		temp.addPoint(7, x + width / 2, y + height / 2, z + depth);
 		temp.setColor(7, 127, 127, 127, 255); // Gray
 
+		temp.rotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
-	static Object dodecahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Dodecahedron(double x = 0, double y = 0, double z = 0,
+							   double width = 1, double height = 1, double depth = 1,
+							   double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		Object temp;
 		temp.polygon.reserve(12);
@@ -466,10 +510,13 @@ public:
 		temp.addPoint(11, x, y + height * (std::sqrt(5) - 1) / 4, z + depth / 2);
 		temp.setColor(11, 127, 127, 0, 255); // Dark Yellow
 
+		temp.rotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
-	static Object icosahedron(double x = 0, double y = 0, double z = 0, double width = 1, double height = 1, double depth = 1)
+	static Object Icosahedron(double x = 0, double y = 0, double z = 0,
+							  double width = 1, double height = 1, double depth = 1,
+							  double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
 		Object temp;
 		temp.polygon.reserve(20);
@@ -575,6 +622,7 @@ public:
 		temp.addPoint(19, x, y + height * (3 - std::sqrt(5)) / 4, z + depth / 2);
 		temp.setColor(19, 255, 127, 255, 255); // Light Magenta
 
+		temp.rotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
@@ -593,7 +641,23 @@ public:
 	{
 	}
 
-	Object(std::vector<std::vector<std::array<double, 3>>> coords, double x_axis, double y_axis, double z_axis)
+	Object(std::vector<std::vector<std::array<double, 3>>> coords)
+	{
+		this->coords = coords;
+		autoCenter();
+	}
+
+	Object(std::vector<std::vector<std::array<double, 3>>> coords,
+		   std::array<double, 3> axis)
+	{
+		this->coords = coords;
+		center_x = axis[0];
+		center_y = axis[1];
+		center_z = axis[2];
+	}
+
+	Object(std::vector<std::vector<std::array<double, 3>>> coords,
+		   double x_axis, double y_axis, double z_axis)
 	{
 		this->coords = coords;
 		center_x = x_axis;
@@ -601,7 +665,12 @@ public:
 		center_z = z_axis;
 	}
 
-	void setPoint(int face, int index, double x, double y, double z, double a = 255)
+	void setPoint(int face, int index, const std::array<double, 3> &point)
+	{
+		setPoint(face, index, point[0], point[1], point[2]);
+	}
+
+	void setPoint(int face, int index, double x, double y, double z)
 	{
 		coords.reserve(face + 1);
 		polygon.reserve(face + 1);
@@ -616,8 +685,12 @@ public:
 		coords[face][index][0] = x;
 		coords[face][index][1] = y;
 		coords[face][index][2] = z;
-		coords[face][index][3] = a;
 		autoCenter();
+	}
+
+	void addPoint(int face, const std::array<double, 3> &point)
+	{
+		addPoint(face, point[0], point[1], point[2]);
 	}
 
 	void addPoint(int face, double x, double y, double z)
@@ -633,12 +706,32 @@ public:
 		autoCenter();
 	}
 
+	void setColor(int face, const std::array<char, 3> &rgb)
+	{
+		setColor(face, rgb[0], rgb[1], rgb[2]);
+	}
+
+	void setColor(int face, const std::array<char, 4> &rgba)
+	{
+		setColor(face, rgba[0], rgba[1], rgba[2], rgba[3]);
+	}
+
 	void setColor(int face, char r, char g, char b, char a = 255)
 	{
 		polygon[face].setFillColor(r, g, b, a);
 	}
 
-	void setOutlineColor(int face, char r, char g, char b, char a)
+	void setOutlineColor(int face, const std::array<char, 3> &rgb)
+	{
+		setOutlineColor(face, rgb[0], rgb[1], rgb[2]);
+	}
+
+	void setOutlineColor(int face, const std::array<char, 4> &rgba)
+	{
+		setOutlineColor(face, rgba[0], rgba[1], rgba[2], rgba[3]);
+	}
+
+	void setOutlineColor(int face, char r, char g, char b, char a = 255)
 	{
 		polygon[face].setOutlineColor(r, g, b, a);
 	}
@@ -648,7 +741,12 @@ public:
 		polygon[face].setOutlineThickness(thick);
 	}
 
-	void setPosition(float x = 0, float y = 0, float z = 0)
+	void setPosition(const std::array<double, 3> &point)
+	{
+		setPosition(point[0], point[1], point[2]);
+	}
+
+	void setPosition(double x = 0, double y = 0, double z = 0)
 	{
 		for (int face{0}; face < coords.size(); face++)
 			for (int point{0}; point < coords[face].size(); point++)
@@ -659,7 +757,12 @@ public:
 			}
 	}
 
-	void movePosition(float x = 0, float y = 0, float z = 0)
+	void movePosition(const std::array<double, 3> &point)
+	{
+		movePosition(point[0], point[1], point[2]);
+	}
+
+	void movePosition(double x = 0, double y = 0, double z = 0)
 	{
 		for (int face{0}; face < coords.size(); face++)
 			for (int point{0}; point < coords[face].size(); point++)
@@ -689,15 +792,27 @@ public:
 		center_z /= vertices;
 	}
 
-	void setCenter(double x, double y, double z)
+	void setCenter(const std::array<double, 3> &point)
+	{
+		setCenter(point[0], point[1], point[2]);
+	}
+
+	void setCenter(double x = 0, double y = 0, double z = 0)
 	{
 		center_x = x;
 		center_y = y;
 		center_z = z;
 	}
 
+	void rotate(const std::array<double, 3> &theta)
+	{
+		rotate(theta[0], theta[1], theta[2]);
+	}
+
 	void rotate(double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
+		if (!theta_x && !theta_y && !theta_z)
+			return;
 		for (int face{0}; face < coords.size(); face++)
 			for (int point{0}; point < coords[face].size(); point++)
 			{
@@ -710,7 +825,7 @@ public:
 				coords[face][point][2] += center_z;
 			}
 	}
-	
+
 	void draw(SDL_Renderer *window) const
 	{
 		std::vector<bool> indeces(coords.size(), false);
@@ -789,15 +904,15 @@ int main(int argc, char *argv[])
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	Object polygons[] = {
-		Object::cube(200, 200, 0, 50, 50, 50),
-		Object::pyramid(6, 50, 50, 0, 50, 50, 50),
-		Object::prism(5, 400, 50, 0, 50, 50, 50),
-		Object::pyramid(6,
+		Object::Cube(200, 200, 0, 50, 50, 50),
+		Object::Pyramid(6, 50, 50, 0, 50, 50, 50),
+		Object::Prism(5, 400, 50, 0, 50, 50, 50),
+		Object::Pyramid(6,
 						std::vector<std::array<char, 4>>{
 							{(char)255, 0, 0, (char)255},
 							{0, 0, (char)255, (char)255}},
-						400, 400, 0, 50, 50, 50), // pyramid, red/blue
-		Object::icosahedron(50, 400, 0, 50, 50, 50)};
+						400, 400, 0, 50, 50, 50),
+		Object::Icosahedron(50, 400, 0, 50, 50, 50)};
 	polygons[2].wireframe = true;
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -825,6 +940,10 @@ int main(int argc, char *argv[])
 					polygon.rotate(-mouseY + event.motion.y, mouseX - event.motion.x, 0);
 				mouseX = event.motion.x;
 				mouseY = event.motion.y;
+				break;
+			case SDL_MOUSEWHEEL:
+				for (Object &polygon : polygons)
+					polygon.rotate(0, 0, -10 * event.wheel.y);
 				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym)
