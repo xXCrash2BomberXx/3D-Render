@@ -159,19 +159,11 @@ private:
 	{
 		double avg{0};
 		for (auto i : face)
-		{
-			i[0] -= center_x;
-			i[1] -= center_y;
-			i[2] -= center_z;
-			avg += rotatePoint(i, theta_x, theta_y, theta_z)[2] + center_z;
-			i[0] += center_x;
-			i[1] += center_y;
-			i[2] += center_z;
-		}
+			avg += rotatePoint(i[0] - center_x, i[1] - center_y, i[2] - center_z, theta_x, theta_y, theta_z)[2] + center_z;
 		return avg / face.size();
 	}
 
-	static std::array<double, 3> rotatePoint(double x, double y, double z, std::array<double, 3> theta)
+	static std::array<double, 3> rotatePoint(double x, double y, double z, const std::array<double, 3> &theta)
 	{
 		return rotatePoint(std::array<double, 3>{x, y, z}, theta[0], theta[1], theta[2]);
 	}
@@ -759,13 +751,13 @@ public:
 	{
 	}
 
-	Object(std::vector<std::vector<std::array<double, 3>>> coords)
+	Object(const std::vector<std::vector<std::array<double, 3>>> &coords)
 	{
 		this->coords = coords;
 		autoCenter();
 	}
 
-	Object(std::vector<std::vector<std::array<double, 3>>> coords,
+	Object(const std::vector<std::vector<std::array<double, 3>>> &coords,
 		   std::array<double, 3> axis)
 	{
 		this->coords = coords;
@@ -774,7 +766,7 @@ public:
 		center_z = axis[2];
 	}
 
-	Object(std::vector<std::vector<std::array<double, 3>>> coords,
+	Object(const std::vector<std::vector<std::array<double, 3>>> &coords,
 		   double x_axis, double y_axis, double z_axis)
 	{
 		this->coords = coords;
