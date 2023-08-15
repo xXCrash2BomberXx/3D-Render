@@ -14,7 +14,7 @@ private:
 		int thickness = 1;
 		bool useOutline = false;
 
-		void setFillColor(char r, char g, char b, char a)
+		void setFillColor(char r, char g, char b, char a = 255)
 		{
 			fill[0] = r;
 			fill[1] = g;
@@ -25,7 +25,7 @@ private:
 				outline = fill;
 			}
 		}
-		void setOutlineColor(char r, char g, char b, char a)
+		void setOutlineColor(char r, char g, char b, char a = 255)
 		{
 			useOutline = true;
 			outline[0] = r;
@@ -34,21 +34,79 @@ private:
 			outline[3] = a;
 		}
 
-		void setOutlineThickness(int thick)
+		void setOutlineThickness(int thick = 1)
 		{
 			thickness = thick;
 		}
 	};
 
-	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon, double x, double y)
+	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon,
+								double x = 0, double y = 0)
 	{
-		int n = polygon.size();
+		return isInsidePolygon(polygon, 0, 0, 0, 0, 0, 0, x, y);
+	}
+
+	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon,
+								std::array<double, 2> point)
+	{
+		return isInsidePolygon(polygon, 0, 0, 0, 0, 0, 0, point[0], point[1]);
+	}
+
+	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon,
+								std::array<double, 3> center,
+								std::array<double, 3> theta,
+								std::array<double, 2> point)
+	{
+		return isInsidePolygon(polygon, center[0], center[1], center[2], theta[0], theta[1], theta[2], point[0], point[1]);
+	}
+
+	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon,
+								std::array<double, 3> center,
+								std::array<double, 3> theta,
+								double x, double y)
+	{
+		return isInsidePolygon(polygon, center[0], center[1], center[2], theta[0], theta[1], theta[2], x, y);
+	}
+
+	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon,
+								const std::array<double, 3> &center,
+								double theta_x, double theta_y, double theta_z,
+								double x, double y)
+	{
+		return isInsidePolygon(polygon, center[0], center[1], center[2], theta_x, theta_y, theta_z, x, y);
+	}
+
+	static bool isInsidePolygon(const std::vector<std::array<double, 3>> &polygon,
+								double center_x, double center_y, double center_z,
+								double theta_x, double theta_y, double theta_z,
+								double x, double y)
+	{
+		const int n = polygon.size();
 		int cnt = 0;
+		std::array<double, 3> p1, p2;
 
 		for (int i = 0; i < n; i++)
 		{
-			const std::array<double, 3> &p1 = polygon[i];
-			const std::array<double, 3> &p2 = polygon[(i + 1) % n];
+			p1 = polygon[i];
+			p2 = polygon[(i + 1) % n];
+			if (theta_x || theta_y || theta_z)
+			{
+				p1[0] -= center_x;
+				p1[1] -= center_y;
+				p1[2] -= center_z;
+				p1 = rotatePoint(p1, theta_x, theta_y, theta_z);
+				p1[0] += center_x;
+				p1[1] += center_y;
+				p1[2] += center_z;
+
+				p2[0] -= center_x;
+				p2[1] -= center_y;
+				p2[2] -= center_z;
+				p2 = rotatePoint(p2, theta_x, theta_y, theta_z);
+				p2[0] += center_x;
+				p2[1] += center_y;
+				p2[2] += center_z;
+			}
 
 			if ((p1[1] <= y && p2[1] <= y) || (p1[1] > y && p2[1] > y))
 				continue;
@@ -62,35 +120,92 @@ private:
 		return cnt % 2 == 1;
 	}
 
-	static double getDepth(const std::vector<std::array<double, 3>> &face)
+	static double getDepth(const std::vector<std::array<double, 3>> &face,
+						   std::array<double, 3> theta)
+	{
+		return getDepth(face, 0, 0, 0, theta[0], theta[1], theta[2]);
+	}
+
+	static double getDepth(const std::vector<std::array<double, 3>> &face,
+						   double theta_x, double theta_y, double theta_z)
+	{
+		return getDepth(face, 0, 0, 0, theta_x, theta_y, theta_z);
+	}
+
+	static double getDepth(const std::vector<std::array<double, 3>> &face,
+						   double center_x, double center_y, double center_z,
+						   std::array<double, 3> theta)
+	{
+		return getDepth(face, center_x, center_y, center_z, theta[0], theta[1], theta[1]);
+	}
+
+	static double getDepth(const std::vector<std::array<double, 3>> &face,
+						   std::array<double, 3> center,
+						   std::array<double, 3> theta)
+	{
+		return getDepth(face, center[0], center[1], center[2], theta[0], theta[1], theta[1]);
+	}
+
+	static double getDepth(const std::vector<std::array<double, 3>> &face,
+						   std::array<double, 3> center,
+						   double theta_x, double theta_y, double theta_z)
+	{
+		return getDepth(face, center[0], center[1], center[2], theta_x, theta_y, theta_z);
+	}
+
+	static double getDepth(const std::vector<std::array<double, 3>> &face,
+						   double center_x, double center_y, double center_z,
+						   double theta_x, double theta_y, double theta_z)
 	{
 		double avg{0};
 		for (auto i : face)
-			avg += i[2];
+		{
+			i[0] -= center_x;
+			i[1] -= center_y;
+			i[2] -= center_z;
+			avg += rotatePoint(i, theta_x, theta_y, theta_z)[2] + center_z;
+			i[0] += center_x;
+			i[1] += center_y;
+			i[2] += center_z;
+		}
 		return avg / face.size();
 	}
 
-	static void rotatePoint(std::array<double, 3> &vec, double theta_x, double theta_y, double theta_z)
+	static std::array<double, 3> rotatePoint(double x, double y, double z, std::array<double, 3> theta)
 	{
-		double x{
+		return rotatePoint(std::array<double, 3>{x, y, z}, theta[0], theta[1], theta[2]);
+	}
+
+	static std::array<double, 3> rotatePoint(double x, double y, double z, double theta_x, double theta_y, double theta_z)
+	{
+		return rotatePoint(std::array<double, 3>{x, y, z}, theta_x, theta_y, theta_z);
+	}
+
+	static std::array<double, 3> rotatePoint(const std::array<double, 3> &vec, const std::array<double, 3> &theta)
+	{
+		return rotatePoint(vec, theta[0], theta[1], theta[2]);
+	}
+
+	static std::array<double, 3> rotatePoint(const std::array<double, 3> &vec, double theta_x, double theta_y, double theta_z)
+	{
+		if (!(theta_x || theta_y || theta_z))
+			return vec;
+		return std::array<double, 3>{
 			vec[0] * cos(theta_z * pi / 180) * cos(theta_y * pi / 180) +
-			vec[1] * cos(theta_z * pi / 180) * sin(theta_y * pi / 180) * sin(theta_x * pi / 180) -
-			vec[1] * sin(theta_z * pi / 180) * cos(theta_x * pi / 180) +
-			vec[2] * cos(theta_z * pi / 180) * sin(theta_y * pi / 180) * cos(theta_x * pi / 180) +
-			vec[2] * sin(theta_z * pi / 180) * sin(theta_x * pi / 180)};
-		double y{
+				vec[1] * cos(theta_z * pi / 180) * sin(theta_y * pi / 180) * sin(theta_x * pi / 180) -
+				vec[1] * sin(theta_z * pi / 180) * cos(theta_x * pi / 180) +
+				vec[2] * cos(theta_z * pi / 180) * sin(theta_y * pi / 180) * cos(theta_x * pi / 180) +
+				vec[2] * sin(theta_z * pi / 180) * sin(theta_x * pi / 180),
+
 			vec[0] * sin(theta_z * pi / 180) * cos(theta_y * pi / 180) +
-			vec[1] * sin(theta_z * pi / 180) * sin(theta_y * pi / 180) * sin(theta_x * pi / 180) +
-			vec[1] * cos(theta_z * pi / 180) * cos(theta_x * pi / 180) +
-			vec[2] * sin(theta_z * pi / 180) * sin(theta_y * pi / 180) * cos(theta_x * pi / 180) -
-			vec[2] * cos(theta_z * pi / 180) * sin(theta_x * pi / 180)};
-		double z{
+				vec[1] * sin(theta_z * pi / 180) * sin(theta_y * pi / 180) * sin(theta_x * pi / 180) +
+				vec[1] * cos(theta_z * pi / 180) * cos(theta_x * pi / 180) +
+				vec[2] * sin(theta_z * pi / 180) * sin(theta_y * pi / 180) * cos(theta_x * pi / 180) -
+				vec[2] * cos(theta_z * pi / 180) * sin(theta_x * pi / 180),
+
 			-vec[0] * sin(theta_y * pi / 180) +
-			vec[1] * cos(theta_y * pi / 180) * sin(theta_x * pi / 180) +
-			vec[2] * cos(theta_y * pi / 180) * cos(theta_x * pi / 180)};
-		vec[0] = x;
-		vec[1] = y;
-		vec[2] = z;
+				vec[1] * cos(theta_y * pi / 180) * sin(theta_x * pi / 180) +
+				vec[2] * cos(theta_y * pi / 180) * cos(theta_x * pi / 180)};
 	}
 
 	enum ObjectType
@@ -281,7 +396,7 @@ private:
 			break;
 		}
 
-		temp.rotate(theta_x, theta_y, theta_z);
+		temp.irotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
@@ -330,7 +445,7 @@ public:
 		temp.addPoint(5, x, y, z + depth);
 		temp.setColor(5, 255, 0, 255, 255); // Magenta
 
-		temp.rotate(theta_x, theta_y, theta_z);
+		temp.irotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
@@ -362,7 +477,7 @@ public:
 		temp.addPoint(3, x, y, z + depth);
 		temp.setColor(3, 255, 255, 0, 255); // Yellow
 
-		temp.rotate(theta_x, theta_y, theta_z);
+		temp.irotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
@@ -414,7 +529,7 @@ public:
 		temp.addPoint(7, x + width / 2, y + height / 2, z + depth);
 		temp.setColor(7, 127, 127, 127, 255); // Gray
 
-		temp.rotate(theta_x, theta_y, theta_z);
+		temp.irotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
@@ -510,7 +625,7 @@ public:
 		temp.addPoint(11, x, y + height * (std::sqrt(5) - 1) / 4, z + depth / 2);
 		temp.setColor(11, 127, 127, 0, 255); // Dark Yellow
 
-		temp.rotate(theta_x, theta_y, theta_z);
+		temp.irotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
@@ -622,7 +737,7 @@ public:
 		temp.addPoint(19, x, y + height * (3 - std::sqrt(5)) / 4, z + depth / 2);
 		temp.setColor(19, 255, 127, 255, 255); // Light Magenta
 
-		temp.rotate(theta_x, theta_y, theta_z);
+		temp.irotate(theta_x, theta_y, theta_z);
 		return temp;
 	}
 
@@ -632,6 +747,9 @@ private:
 	double center_x{0};
 	double center_y{0};
 	double center_z{0};
+	double theta_x{0};
+	double theta_y{0};
+	double theta_z{0};
 
 public:
 	bool borderless = false;
@@ -688,12 +806,17 @@ public:
 		autoCenter();
 	}
 
+	void addPoint(int face, const std::array<double, 2> &point)
+	{
+		addPoint(face, point[0], point[1], 0);
+	}
+
 	void addPoint(int face, const std::array<double, 3> &point)
 	{
 		addPoint(face, point[0], point[1], point[2]);
 	}
 
-	void addPoint(int face, double x, double y, double z)
+	void addPoint(int face, double x, double y, double z = 0)
 	{
 		coords.reserve(face + 1);
 		polygon.reserve(face + 1);
@@ -741,6 +864,11 @@ public:
 		polygon[face].setOutlineThickness(thick);
 	}
 
+	void setPosition(const std::array<double, 2> &point)
+	{
+		setPosition(point[0], point[1], 0);
+	}
+
 	void setPosition(const std::array<double, 3> &point)
 	{
 		setPosition(point[0], point[1], point[2]);
@@ -755,6 +883,11 @@ public:
 				coords[face][point][1] += (y - center_y);
 				coords[face][point][2] += (z - center_z);
 			}
+	}
+
+	void movePosition(const std::array<double, 2> &point)
+	{
+		movePosition(point[0], point[1], 0);
 	}
 
 	void movePosition(const std::array<double, 3> &point)
@@ -792,6 +925,11 @@ public:
 		center_z /= vertices;
 	}
 
+	void setCenter(const std::array<double, 2> &point)
+	{
+		setCenter(point[0], point[1], 0);
+	}
+
 	void setCenter(const std::array<double, 3> &point)
 	{
 		setCenter(point[0], point[1], point[2]);
@@ -804,6 +942,84 @@ public:
 		center_z = z;
 	}
 
+	static std::array<double, 3> joinRotations(double theta1_x, double theta1_y, double theta1_z,
+											   double theta2_x, double theta2_y, double theta2_z)
+	{
+		return joinRotations(std::array<double, 3>{theta1_x, theta1_y, theta1_z},
+							 std::array<double, 3>{theta2_x, theta2_y, theta2_z});
+	}
+
+	static std::array<double, 3> joinRotations(const std::array<double, 3> &theta1,
+											   double theta2_x, double theta2_y, double theta2_z)
+	{
+		return joinRotations(theta1, std::array<double, 3>{theta2_x, theta2_y, theta2_z});
+	}
+
+	static std::array<double, 3> joinRotations(const std::array<double, 3> &theta1,
+											   const std::array<double, 3> &theta2)
+	{
+		double c1 = cos(theta1[0] * pi / 180);
+		double c2 = cos(theta1[1] * pi / 180);
+		double c3 = cos(theta1[2] * pi / 180);
+		double s1 = sin(theta1[0] * pi / 180);
+		double s2 = sin(theta1[1] * pi / 180);
+		double s3 = sin(theta1[2] * pi / 180);
+		std::array<std::array<double, 3>, 3> Rx1{
+			std::array<double, 3>{1, 0, 0},
+			std::array<double, 3>{0, c1, -s1},
+			std::array<double, 3>{0, s1, c1}};
+		std::array<std::array<double, 3>, 3> Ry1{
+			std::array<double, 3>{c2, 0, s2},
+			std::array<double, 3>{0, 1, 0},
+			std::array<double, 3>{-s2, 0, c2}};
+		std::array<std::array<double, 3>, 3> Rz1{
+			std::array<double, 3>{c3, -s3, 0},
+			std::array<double, 3>{s3, c3, 0},
+			std::array<double, 3>{0, 0, 1}};
+		std::array<std::array<double, 3>, 3> R1 = multiplyMatrices(multiplyMatrices(Rz1, Ry1), Rx1);
+		double c4 = cos(theta2[0] * pi / 180);
+		double c5 = cos(theta2[1] * pi / 180);
+		double c6 = cos(theta2[2] * pi / 180);
+		double s4 = sin(theta2[0] * pi / 180);
+		double s5 = sin(theta2[1] * pi / 180);
+		double s6 = sin(theta2[2] * pi / 180);
+		std::array<std::array<double, 3>, 3> Rx2{
+			std::array<double, 3>{1, 0, 0},
+			std::array<double, 3>{0, c4, -s4},
+			std::array<double, 3>{0, s4, c4}};
+		std::array<std::array<double, 3>, 3> Ry2{
+			std::array<double, 3>{c5, 0, s5},
+			std::array<double, 3>{0, 1, 0},
+			std::array<double, 3>{-s5, 0, c5}};
+		std::array<std::array<double, 3>, 3> Rz2{
+			std::array<double, 3>{c6, -s6, 0},
+			std::array<double, 3>{s6, c6, 0},
+			std::array<double, 3>{0, 0, 1}};
+		std::array<std::array<double, 3>, 3> R2 = multiplyMatrices(multiplyMatrices(Rz2, Ry2), Rx2);
+		std::array<std::array<double, 3>, 3> R3 = multiplyMatrices(R2, R1);
+		double theta_x = atan2(R3[2][1], R3[2][2]);
+		double theta_y = atan2(-R3[2][0], sqrt(R3[2][1] * R3[2][1] + R3[2][2] * R3[2][2]));
+		double theta_z = atan2(R3[1][0], R3[0][0]);
+
+		return std::array<double, 3>{fmod(theta_x * 180 / pi + 360, 360),
+									 fmod(theta_y * 180 / pi + 360, 360),
+									 fmod(theta_z * 180 / pi + 360, 360)};
+	}
+
+	static std::array<std::array<double, 3>, 3> multiplyMatrices(const std::array<std::array<double, 3>, 3> &A,
+																 const std::array<std::array<double, 3>, 3> &B)
+	{
+		std::array<std::array<double, 3>, 3> C;
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+			{
+				C[i][j] = 0;
+				for (int k = 0; k < 3; k++)
+					C[i][j] += A[i][k] * B[k][j];
+			}
+		return C;
+	}
+
 	void rotate(const std::array<double, 3> &theta)
 	{
 		rotate(theta[0], theta[1], theta[2]);
@@ -811,55 +1027,108 @@ public:
 
 	void rotate(double theta_x = 0, double theta_y = 0, double theta_z = 0)
 	{
-		if (!theta_x && !theta_y && !theta_z)
+		std::array<double, 3> temp = joinRotations(this->theta_x, this->theta_y, this->theta_z, theta_x, theta_y, theta_z);
+		this->theta_x = std::fmod(temp[0] + 360, 360);
+		this->theta_y = std::fmod(temp[1] + 360, 360);
+		this->theta_z = std::fmod(temp[2] + 360, 360);
+	}
+
+	void irotate(const std::array<double, 3> &theta)
+	{
+		irotate(theta[0], theta[1], theta[2]);
+	}
+
+	void irotate(double theta_x = 0, double theta_y = 0, double theta_z = 0)
+	{
+		if (!(theta_x || theta_y || theta_z))
 			return;
+		std::array<double, 3> temp;
 		for (int face{0}; face < coords.size(); face++)
 			for (int point{0}; point < coords[face].size(); point++)
 			{
 				coords[face][point][0] -= center_x;
 				coords[face][point][1] -= center_y;
 				coords[face][point][2] -= center_z;
-				rotatePoint(coords[face][point], theta_x, theta_y, theta_z);
-				coords[face][point][0] += center_x;
-				coords[face][point][1] += center_y;
-				coords[face][point][2] += center_z;
+				temp = rotatePoint(coords[face][point], theta_x, theta_y, theta_z);
+				coords[face][point][0] = temp[0] + center_x;
+				coords[face][point][1] = temp[1] + center_y;
+				coords[face][point][2] = temp[2] + center_z;
 			}
 	}
 
 	void draw(SDL_Renderer *window) const
 	{
 		std::vector<bool> indeces(coords.size(), false);
-		std::array<double, 4> minmax = {coords[0][0][0], coords[0][0][1], coords[0][0][0], coords[0][0][1]};
+		std::array<double, 4> minmax{0, 0, 0, 0};
+		std::array<double, 3> point1, point2;
 		if (!wireframe)
+		{
+			double temp;
+			bool first = true;
 			for (auto face : coords)
 				for (auto point : face)
 				{
-					if (point[0] < minmax[0])
-						minmax[0] = point[0];
-					else if (point[0] > minmax[2])
-						minmax[2] = point[0];
-					if (point[1] < minmax[1])
-						minmax[1] = point[1];
-					else if (point[1] > minmax[3])
-						minmax[3] = point[1];
+					temp = rotatePoint(point[0] - center_x, point[1] - center_y, point[2] - center_z, theta_x, theta_y, theta_z)[0] + center_x;
+					if (first)
+					{
+						minmax[0] = temp;
+						minmax[2] = temp;
+					}
+					else if (temp < minmax[0])
+						minmax[0] = temp;
+					else if (temp > minmax[2])
+						minmax[2] = temp;
+					temp = rotatePoint(point[0] - center_x, point[1] - center_y, point[2] - center_z, theta_x, theta_y, theta_z)[1] + center_y;
+					if (first)
+					{
+						minmax[1] = temp;
+						minmax[3] = temp;
+					}
+					else if (temp < minmax[1])
+						minmax[1] = temp;
+					else if (temp > minmax[3])
+						minmax[3] = temp;
+					first = false;
 				}
+		}
 		for (int loop{0}; loop < coords.size(); loop++)
 		{
 			int current{-1};
 			for (int index{0}; index < coords.size(); index++)
-				if (((current != -1) ? (getDepth(coords[index]) >= getDepth(coords[current])) : true) && !indeces[index])
+				if (((current != -1) ? (
+										   getDepth(coords[index], center_x, center_y, center_z, theta_x, theta_y, theta_z) >=
+										   getDepth(coords[current], center_x, center_y, center_z, theta_x, theta_y, theta_z))
+									 : true) &&
+					!indeces[index])
 					current = index;
 			if (!borderless)
 			{
 				SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].outline[1],
 									   polygon[current].outline[2], polygon[current].outline[3]);
 				for (int index{0}; index < coords[current].size(); index++)
-					if (index == coords[current].size() - 1)
-						SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
-										   coords[current][0][0], coords[current][0][1]);
-					else
-						SDL_RenderDrawLine(window, coords[current][index][0], coords[current][index][1],
-										   coords[current][index + 1][0], coords[current][index + 1][1]);
+				{
+					point1 = coords[current][index];
+					point2 = coords[current][index == coords[current].size() - 1 ? 0 : index + 1];
+					if (theta_x || theta_y || theta_z)
+					{
+						point1[0] -= center_x;
+						point1[1] -= center_y;
+						point1[2] -= center_z;
+						point1 = rotatePoint(point1, theta_x, theta_y, theta_z);
+						point1[0] += center_x;
+						point1[1] += center_y;
+						point1[2] += center_z;
+
+						point2[0] -= center_x;
+						point2[1] -= center_y;
+						point2[2] -= center_z;
+						point2 = rotatePoint(point2, theta_x, theta_y, theta_z);
+						point2[0] += center_x;
+						point2[1] += center_y;
+						point2[2] += center_z;
+					}
+					SDL_RenderDrawLine(window, point1[0], point1[1], point2[0], point2[1]);
+				}
 			}
 			if (!wireframe)
 			{
@@ -867,7 +1136,7 @@ public:
 									   polygon[current].fill[2], polygon[current].fill[3]);
 				for (double x{minmax[0]}; x < minmax[2]; x++)
 					for (double y{minmax[1]}; y < minmax[3]; y++)
-						if (isInsidePolygon(coords[current], x, y))
+						if (isInsidePolygon(coords[current], center_x, center_y, center_z, theta_x, theta_y, theta_z, x, y))
 							SDL_RenderDrawPoint(window, x, y);
 			}
 			indeces[current] = true;
@@ -937,13 +1206,13 @@ int main(int argc, char *argv[])
 				break;
 			case SDL_MOUSEMOTION:
 				for (Object &polygon : polygons)
-					polygon.rotate(-mouseY + event.motion.y, mouseX - event.motion.x, 0);
+					polygon.irotate(-mouseY + event.motion.y, mouseX - event.motion.x, 0);
 				mouseX = event.motion.x;
 				mouseY = event.motion.y;
 				break;
 			case SDL_MOUSEWHEEL:
 				for (Object &polygon : polygons)
-					polygon.rotate(0, 0, -10 * event.wheel.y);
+					polygon.irotate(0, 0, -10 * event.wheel.y);
 				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym)
@@ -954,31 +1223,31 @@ int main(int argc, char *argv[])
 				case SDLK_UP:
 				case SDLK_w:
 					for (Object &polygon : polygons)
-						polygon.rotate(-20, 0, 0);
+						polygon.irotate(-20, 0, 0);
 					break;
 				case SDLK_DOWN:
 				case SDLK_s:
 					for (Object &polygon : polygons)
-						polygon.rotate(20, 0, 0);
+						polygon.irotate(20, 0, 0);
 					break;
 				case SDLK_LEFT:
 				case SDLK_a:
 					for (Object &polygon : polygons)
-						polygon.rotate(0, 20, 0);
+						polygon.irotate(0, 20, 0);
 					break;
 				case SDLK_RIGHT:
 				case SDLK_d:
 					for (Object &polygon : polygons)
-						polygon.rotate(0, -20, 0);
+						polygon.irotate(0, -20, 0);
 					break;
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
 					for (Object &polygon : polygons)
-						polygon.rotate(0, 0, -20);
+						polygon.irotate(0, 0, -20);
 					break;
 				case SDLK_SPACE:
 					for (Object &polygon : polygons)
-						polygon.rotate(0, 0, 20);
+						polygon.irotate(0, 0, 20);
 					break;
 				default:
 					break;
