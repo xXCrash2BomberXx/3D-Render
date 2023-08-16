@@ -2,7 +2,6 @@
 #include <vector>
 #include <array>
 #include <cmath>
-#define pi 3.14159265358979323846
 
 class Object
 {
@@ -183,21 +182,21 @@ private:
 		if (!(theta_x || theta_y || theta_z))
 			return vec;
 		return std::array<double, 3>{
-			vec[0] * cos(theta_z * pi / 180) * cos(theta_y * pi / 180) +
-				vec[1] * cos(theta_z * pi / 180) * sin(theta_y * pi / 180) * sin(theta_x * pi / 180) -
-				vec[1] * sin(theta_z * pi / 180) * cos(theta_x * pi / 180) +
-				vec[2] * cos(theta_z * pi / 180) * sin(theta_y * pi / 180) * cos(theta_x * pi / 180) +
-				vec[2] * sin(theta_z * pi / 180) * sin(theta_x * pi / 180),
+			vec[0] * cos(theta_z * M_PI / 180) * cos(theta_y * M_PI / 180) +
+				vec[1] * cos(theta_z * M_PI / 180) * sin(theta_y * M_PI / 180) * sin(theta_x * M_PI / 180) -
+				vec[1] * sin(theta_z * M_PI / 180) * cos(theta_x * M_PI / 180) +
+				vec[2] * cos(theta_z * M_PI / 180) * sin(theta_y * M_PI / 180) * cos(theta_x * M_PI / 180) +
+				vec[2] * sin(theta_z * M_PI / 180) * sin(theta_x * M_PI / 180),
 
-			vec[0] * sin(theta_z * pi / 180) * cos(theta_y * pi / 180) +
-				vec[1] * sin(theta_z * pi / 180) * sin(theta_y * pi / 180) * sin(theta_x * pi / 180) +
-				vec[1] * cos(theta_z * pi / 180) * cos(theta_x * pi / 180) +
-				vec[2] * sin(theta_z * pi / 180) * sin(theta_y * pi / 180) * cos(theta_x * pi / 180) -
-				vec[2] * cos(theta_z * pi / 180) * sin(theta_x * pi / 180),
+			vec[0] * sin(theta_z * M_PI / 180) * cos(theta_y * M_PI / 180) +
+				vec[1] * sin(theta_z * M_PI / 180) * sin(theta_y * M_PI / 180) * sin(theta_x * M_PI / 180) +
+				vec[1] * cos(theta_z * M_PI / 180) * cos(theta_x * M_PI / 180) +
+				vec[2] * sin(theta_z * M_PI / 180) * sin(theta_y * M_PI / 180) * cos(theta_x * M_PI / 180) -
+				vec[2] * cos(theta_z * M_PI / 180) * sin(theta_x * M_PI / 180),
 
-			-vec[0] * sin(theta_y * pi / 180) +
-				vec[1] * cos(theta_y * pi / 180) * sin(theta_x * pi / 180) +
-				vec[2] * cos(theta_y * pi / 180) * cos(theta_x * pi / 180)};
+			-vec[0] * sin(theta_y * M_PI / 180) +
+				vec[1] * cos(theta_y * M_PI / 180) * sin(theta_x * M_PI / 180) +
+				vec[2] * cos(theta_y * M_PI / 180) * cos(theta_x * M_PI / 180)};
 	}
 
 	enum ObjectType
@@ -207,6 +206,30 @@ private:
 	};
 
 public:
+	static Object Polyhedron(unsigned int faces,
+							 double x = 0, double y = 0, double z = 0,
+							 double width = 1, double height = 1, double depth = 1,
+							 double theta_x = 0, double theta_y = 0, double theta_z = 0)
+	{
+		Object temp;
+		double theta, phi;
+		for (int i = 0; i < faces; ++i)
+		{
+			theta = 2.0 * M_PI * i / faces;
+			phi = acos(1.0 - (2.0 * (i + 0.5)) / faces);
+
+			temp.addPoint(i,
+				cos(theta) * sin(phi),
+				sin(theta) * sin(phi),
+				cos(phi));
+			temp.addPoint(i,
+				cos(2.0 * M_PI * (i + 1) / faces) * sin(phi),
+            sin(2.0 * M_PI * (i + 1) / faces) * sin(phi),
+            cos(phi));
+		}
+		return temp;
+	}
+
 	static Object Pyramid(unsigned int edges,
 						  double x = 0, double y = 0, double z = 0,
 						  double width = 1, double height = 1, double depth = 1,
@@ -355,15 +378,15 @@ private:
 
 			for (unsigned int vertex = 0; vertex < edges; vertex++)
 			{
-				double angle = (vertex / static_cast<double>(edges)) * 2 * pi;
+				double angle = (vertex / static_cast<double>(edges)) * 2 * M_PI;
 				double curX = x + (cos(angle) + 1) / 2 * width;
 				double curY = y + (sin(angle) + 1) / 2 * height;
 				temp.addPoint(0, curX, curY, z);
 				temp.addPoint(1, curX, curY, z + depth);
 				temp.addPoint(vertex + 2, curX, curY, z);
 				temp.addPoint(vertex + 2, curX, curY, z + depth);
-				temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z + depth);
-				temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z);
+				temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * M_PI) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * M_PI) + 1) / 2 * height, z + depth);
+				temp.addPoint(vertex + 2, x + (cos(angle + 1.0 / edges * 2 * M_PI) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * M_PI) + 1) / 2 * height, z);
 				temp.polygon[vertex + 2] = args[(vertex + 2) % args.size()];
 			}
 			temp.polygon[0] = args[0 % args.size()];
@@ -375,13 +398,13 @@ private:
 
 			for (unsigned int vertex = 0; vertex < edges; vertex++)
 			{
-				double angle = (vertex / static_cast<double>(edges)) * 2 * pi;
+				double angle = (vertex / static_cast<double>(edges)) * 2 * M_PI;
 				double curX = x + (cos(angle) + 1) / 2 * width;
 				double curY = y + (sin(angle) + 1) / 2 * height;
 				temp.addPoint(0, curX, curY, z);
 				temp.addPoint(vertex + 1, curX, curY, z);
 				temp.addPoint(vertex + 1, x + width / 2, y + height / 2, z + depth);
-				temp.addPoint(vertex + 1, x + (cos(angle + 1.0 / edges * 2 * pi) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * pi) + 1) / 2 * height, z);
+				temp.addPoint(vertex + 1, x + (cos(angle + 1.0 / edges * 2 * M_PI) + 1) / 2 * width, y + (sin(angle + 1.0 / edges * 2 * M_PI) + 1) / 2 * height, z);
 				temp.polygon[vertex + 1] = args[(vertex + 1) % args.size()];
 			}
 			temp.polygon[0] = args[0 % args.size()];
@@ -950,12 +973,12 @@ public:
 	static std::array<double, 3> joinRotations(const std::array<double, 3> &theta1,
 											   const std::array<double, 3> &theta2)
 	{
-		double c1 = cos(theta1[0] * pi / 180);
-		double c2 = cos(theta1[1] * pi / 180);
-		double c3 = cos(theta1[2] * pi / 180);
-		double s1 = sin(theta1[0] * pi / 180);
-		double s2 = sin(theta1[1] * pi / 180);
-		double s3 = sin(theta1[2] * pi / 180);
+		double c1 = cos(theta1[0] * M_PI / 180);
+		double c2 = cos(theta1[1] * M_PI / 180);
+		double c3 = cos(theta1[2] * M_PI / 180);
+		double s1 = sin(theta1[0] * M_PI / 180);
+		double s2 = sin(theta1[1] * M_PI / 180);
+		double s3 = sin(theta1[2] * M_PI / 180);
 		std::array<std::array<double, 3>, 3> Rx1{
 			std::array<double, 3>{1, 0, 0},
 			std::array<double, 3>{0, c1, -s1},
@@ -969,12 +992,12 @@ public:
 			std::array<double, 3>{s3, c3, 0},
 			std::array<double, 3>{0, 0, 1}};
 		std::array<std::array<double, 3>, 3> R1 = multiplyMatrices(multiplyMatrices(Rz1, Ry1), Rx1);
-		double c4 = cos(theta2[0] * pi / 180);
-		double c5 = cos(theta2[1] * pi / 180);
-		double c6 = cos(theta2[2] * pi / 180);
-		double s4 = sin(theta2[0] * pi / 180);
-		double s5 = sin(theta2[1] * pi / 180);
-		double s6 = sin(theta2[2] * pi / 180);
+		double c4 = cos(theta2[0] * M_PI / 180);
+		double c5 = cos(theta2[1] * M_PI / 180);
+		double c6 = cos(theta2[2] * M_PI / 180);
+		double s4 = sin(theta2[0] * M_PI / 180);
+		double s5 = sin(theta2[1] * M_PI / 180);
+		double s6 = sin(theta2[2] * M_PI / 180);
 		std::array<std::array<double, 3>, 3> Rx2{
 			std::array<double, 3>{1, 0, 0},
 			std::array<double, 3>{0, c4, -s4},
@@ -993,9 +1016,9 @@ public:
 		double theta_y = atan2(-R3[2][0], sqrt(R3[2][1] * R3[2][1] + R3[2][2] * R3[2][2]));
 		double theta_z = atan2(R3[1][0], R3[0][0]);
 
-		return std::array<double, 3>{fmod(theta_x * 180 / pi + 360, 360),
-									 fmod(theta_y * 180 / pi + 360, 360),
-									 fmod(theta_z * 180 / pi + 360, 360)};
+		return std::array<double, 3>{fmod(theta_x * 180 / M_PI + 360, 360),
+									 fmod(theta_y * 180 / M_PI + 360, 360),
+									 fmod(theta_z * 180 / M_PI + 360, 360)};
 	}
 
 	static std::array<std::array<double, 3>, 3> multiplyMatrices(const std::array<std::array<double, 3>, 3> &A,
@@ -1050,9 +1073,7 @@ public:
 
 	void draw(SDL_Renderer *window) const
 	{
-		std::vector<bool> indeces(coords.size(), false);
 		std::array<double, 4> minmax{0, 0, 0, 0};
-		std::array<double, 3> point1, point2;
 		if (!wireframe)
 		{
 			double temp;
@@ -1083,6 +1104,8 @@ public:
 					first = false;
 				}
 		}
+		std::vector<bool> indeces(coords.size(), false);
+		std::array<double, 3> point1, point2;
 		for (int loop{0}; loop < coords.size(); loop++)
 		{
 			int current{-1};
@@ -1095,9 +1118,10 @@ public:
 					current = index;
 			if (!borderless)
 			{
-				SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].outline[1],
+				SDL_SetRenderDrawColor(window, polygon[current].outline[0], polygon[current].outline[1],
 									   polygon[current].outline[2], polygon[current].outline[3]);
-				for (int index{0}; index < coords[current].size(); index++)
+				const std::array<double, 3> root = coords[current][0];
+				for (int index{1}; index < coords[current].size(); index++)
 				{
 					point1 = coords[current][index];
 					point2 = coords[current][index == coords[current].size() - 1 ? 0 : index + 1];
@@ -1126,10 +1150,26 @@ public:
 			{
 				SDL_SetRenderDrawColor(window, polygon[current].fill[0], polygon[current].fill[1],
 									   polygon[current].fill[2], polygon[current].fill[3]);
+				double start = -1;
 				for (double x{minmax[0]}; x < minmax[2]; x++)
+				{
 					for (double y{minmax[1]}; y < minmax[3]; y++)
 						if (isInsidePolygon(coords[current], center_x, center_y, center_z, theta_x, theta_y, theta_z, x, y))
-							SDL_RenderDrawPoint(window, x, y);
+						{
+							if (start == -1)
+								start = y;
+						}
+						else if (start != -1)
+						{
+							SDL_RenderDrawLine(window, x, start, x, y-1);
+							start = -1;
+						}
+					if (start != -1)
+					{
+						SDL_RenderDrawLine(window, x, start, x, minmax[3]);
+						start = -1;
+					}
+				}
 			}
 			indeces[current] = true;
 		}
