@@ -805,16 +805,9 @@ public:
 
 	void setPoint(int face, int index, double x, double y, double z)
 	{
-		coords.reserve(face + 1);
-		polygon.reserve(face + 1);
-		while (face >= coords.size())
-		{
-			coords.push_back(std::vector<std::array<double, 3>>{});
-			polygon.push_back(Prop());
-		}
-		coords[face].reserve(index + 1);
-		while (index >= coords[face].size())
-			coords[face].push_back(std::array<double, 3>{0, 0, 0});
+		coords.resize(coords.size() > face + 1 ? coords.size() : face + 1);
+		polygon.resize(polygon.size() > face + 1 ? polygon.size() : face + 1);
+		coords[face].resize(coords[face].size() > index + 1 ? coords[face].size() : index + 1);
 		coords[face][index][0] = x;
 		coords[face][index][1] = y;
 		coords[face][index][2] = z;
@@ -833,13 +826,8 @@ public:
 
 	void addPoint(int face, double x, double y, double z = 0)
 	{
-		coords.reserve(face + 1);
-		polygon.reserve(face + 1);
-		while (face >= coords.size())
-		{
-			coords.push_back(std::vector<std::array<double, 3>>{});
-			polygon.push_back(Prop());
-		}
+		coords.resize(coords.size() > face + 1 ? coords.size() : face + 1);
+		polygon.resize(polygon.size() > face + 1 ? polygon.size() : face + 1);
 		coords[face].push_back(std::array<double, 3>{x, y, z});
 		autoCenter();
 	}
